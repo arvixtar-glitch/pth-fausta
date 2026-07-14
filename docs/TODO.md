@@ -1,0 +1,61 @@
+# PTH Fausta – Darbų planas
+
+## 1 etapas – Projekto pagrindas ✅
+
+* [x] Sukurti projekto karkasą.
+* [x] Sutvarkyti projekto struktūrą.
+* [x] Sukurti Core architektūrą.
+* [x] Sukurti projektų kelių (Paths) valdymo modulį.
+* [x] Sukurti žurnalavimo (Logging) sistemą.
+* [x] Sukurti nustatymų (Settings) valdymo sistemą.
+* [x] Sukurti konfigūracijos (Config) modulį.
+* [x] Sukurti versijos (Version) modulį.
+* [x] Sukurti programos gyvavimo ciklo (Application) modulį.
+* [x] Sukurti pagrindinį programos paleidimo tašką (Main).
+* [x] Sukurti ir patvirtinti Core dokumentaciją.
+* [x] Atlikti Core architektūros auditą.
+* [x] Sukurti Core vienetinius testus.
+
+---
+
+## 2 etapas – MVC pagrindas ⏳
+
+* [ ] Sukurti MVC architektūros pagrindą.
+* [ ] Sukurti bazines Controller klases.
+* [ ] Sukurti bazines Service klases.
+* [ ] Sukurti bazines Repository klases.
+* [ ] Sukurti bazines Model klases.
+* [ ] Sukurti View infrastruktūrą.
+
+---
+
+## 3 etapas – Duomenų sluoksnis
+
+* [ ] Sukurti SQLAlchemy infrastruktūrą.
+* [ ] Sukurti duomenų bazės modelius.
+* [ ] Sukurti migracijų sistemą.
+
+---
+
+## 4 etapas – Verslo moduliai
+
+* [ ] Klientai.
+* [ ] Pardavėjas.
+* [ ] Sąskaitos.
+* [ ] PDF generavimas.
+* [ ] QR kodų generavimas.
+* [ ] El. pašto modulis.
+* [ ] Statistika.
+* [ ] Atsarginių kopijų modulis.
+
+---
+
+## Pastabos
+
+* Kiekvienas etapas laikomas užbaigtu tik po:
+
+  * kodo parašymo;
+  * testų;
+  * kodo peržiūros;
+  * architektūros audito;
+  * dokumentacijos atnaujinimo.

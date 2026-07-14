@@ -1,0 +1,9 @@
+PySide6
+SQLAlchemy
+ReportLab
+openpyxl
+segno
+pydantic-settings
+pytest
+black
+ruff

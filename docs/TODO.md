@@ -20,12 +20,16 @@
 
 ## 2 etapas – MVC pagrindas ⏳
 
-* [ ] Sukurti MVC architektūros pagrindą.
-* [ ] Sukurti bazines Controller klases.
+* [x] Sukurti MVC architektūros pagrindą.
+* [x] Sukurti bazines Controller klases.
 * [ ] Sukurti bazines Service klases.
 * [ ] Sukurti bazines Repository klases.
-* [ ] Sukurti bazines Model klases.
-* [ ] Sukurti View infrastruktūrą.
+* [x] Sukurti bazines Model klases.
+* [x] Sukurti View infrastruktūrą.
+* [x] Sukurti EventBus.
+* [x] Sukurti AppController.
+* [x] Sukurti NavigationService.
+* [x] Sukurti ServiceContainer.
 
 ---
 

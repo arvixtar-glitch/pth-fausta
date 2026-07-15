@@ -1,5 +1,41 @@
 # PTH Fausta - Pakeitimų istorija
 
+## v0.1.1 (2026-07-15)
+
+### Pridėta
+
+#### MVC pagrindas
+
+* Sukurtos bazinės MVC klasės: `BaseModel`, `BaseView` ir `BaseController`.
+* Pridėti minimalūs paketų eksportai `app.models`, `app.views` ir `app.controllers`.
+* Sukurti vienetiniai testai bazinėms MVC klasėms.
+
+#### EventBus
+
+* Pridėtas sinchroninis `EventBus` prenumeravimui, atsisakymui, publikavimui ir prenumeratų valymui.
+* Sukurti `EventBus` vienetiniai testai.
+
+#### AppController
+
+* Pridėtas aukščiausio lygio `AppController` su idempotentišku `start()` ir `stop()` valdymu.
+* Sukurti `AppController` vienetiniai testai.
+
+#### NavigationService
+
+* Pridėtas `NavigationService` aktyvaus kontrolerio perjungimui.
+* Įdiegtas saugus kontrolerių paleidimo ir sustabdymo eiliškumas.
+* Sukurti `NavigationService` vienetiniai testai.
+
+#### ServiceContainer
+
+* Pridėtas `ServiceContainer` servisų registravimui, gavimui, pakeitimui ir pašalinimui pagal tipą.
+* Pridėta `ServiceNotRegisteredError` kaip aiškus klaidos tipas nerastam servisui.
+* Sukurti `ServiceContainer` vienetiniai testai.
+
+### Patikrinimas
+
+* Patikrintas bazinių MVC klasių ir `EventBus` elgesys naudojant `pytest`.
+
 ## v0.1.0 (2026-07-14)
 
 ### Pridėta

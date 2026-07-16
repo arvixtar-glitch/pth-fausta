@@ -1,16 +1,22 @@
+"""Tests for application lifecycle orchestration."""
+
+from __future__ import annotations
+
 import sys
-import unittest
 from pathlib import Path
-from types import SimpleNamespace
 from unittest.mock import Mock
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from app.core.app import Application
+from app.core.app import Application  # noqa: E402
 
 
 class DummyLogger:
+    """Collect logged informational messages."""
+
     def __init__(self) -> None:
         self.messages: list[str] = []
 
@@ -19,86 +25,92 @@ class DummyLogger:
 
 
 class DummyConfig:
+    """Provide a logger to Application."""
+
     def __init__(self) -> None:
         self.logger = DummyLogger()
 
 
-class ApplicationTests(unittest.TestCase):
-    def test_uses_provided_config(self) -> None:
-        config = DummyConfig()
-        application = Application(config)
-
-        self.assertIs(application.config, config)
-
-    def test_uses_config_logger(self) -> None:
-        config = DummyConfig()
-        application = Application(config)
-
-        self.assertIs(application.logger, config.logger)
-
-    def test_run_returns_zero(self) -> None:
-        application = Application(DummyConfig())
-
-        self.assertEqual(application.run(), 0)
-
-    def test_run_logs_application_name_and_version(self) -> None:
-        config = DummyConfig()
-        application = Application(config)
-
-        application.run()
-
-        self.assertIn("Starting PTH Fausta 0.1.0.", config.logger.messages)
-
-    def test_run_logs_ready_message(self) -> None:
-        config = DummyConfig()
-        application = Application(config)
-
-        application.run()
-
-        self.assertIn("Application is ready.", config.logger.messages)
-
-    def test_shutdown_logs_shutdown_message(self) -> None:
-        config = DummyConfig()
-        application = Application(config)
-
-        application.shutdown()
-
-        self.assertIn("Application shutdown completed.", config.logger.messages)
-
-    def test_execute_invokes_run(self) -> None:
-        config = DummyConfig()
-        application = Application(config)
-        application.run = Mock(return_value=0)  # type: ignore[assignment]
-
-        self.assertEqual(application.execute(), 0)
-        application.run.assert_called_once_with()
-
-    def test_execute_always_invokes_shutdown(self) -> None:
-        config = DummyConfig()
-        application = Application(config)
-        application.run = Mock(side_effect=RuntimeError("boom"))  # type: ignore[assignment]
-        application.shutdown = Mock()  # type: ignore[assignment]
-
-        with self.assertRaises(RuntimeError):
-            application.execute()
-
-        application.shutdown.assert_called_once_with()
-
-    def test_execute_returns_run_exit_code(self) -> None:
-        config = DummyConfig()
-        application = Application(config)
-        application.run = Mock(return_value=7)  # type: ignore[assignment]
-
-        self.assertEqual(application.execute(), 7)
-
-    def test_execute_propagates_run_exception(self) -> None:
-        config = DummyConfig()
-        application = Application(config)
-        application.run = Mock(side_effect=ValueError("boom"))  # type: ignore[assignment]
-
-        with self.assertRaises(ValueError):
-            application.execute()
+@pytest.fixture
+def dependencies() -> tuple[Mock, Mock, Mock, Mock, DummyConfig]:
+    app_state = Mock()
+    navigation = Mock()
+    controller = Mock()
+    event_loop = Mock()
+    event_loop.run.return_value = 7
+    return app_state, navigation, controller, event_loop, DummyConfig()
 
 
-if __name__ == "__main__":
-    unittest.main()
+def make_application(dependencies: tuple[Mock, Mock, Mock, Mock, DummyConfig]) -> Application:
+    app_state, navigation, controller, event_loop, config = dependencies
+    return Application(app_state, navigation, controller, event_loop, config)  # type: ignore[arg-type]
+
+
+def test_uses_provided_dependencies(
+    dependencies: tuple[Mock, Mock, Mock, Mock, DummyConfig],
+) -> None:
+    application = make_application(dependencies)
+    app_state, navigation, controller, event_loop, config = dependencies
+
+    assert application.app_state is app_state
+    assert application.navigation_service is navigation
+    assert application.app_controller is controller
+    assert application.event_loop is event_loop
+    assert application.config is config
+    assert application.logger is config.logger
+
+
+def test_run_starts_state_navigates_and_runs_event_loop(
+    dependencies: tuple[Mock, Mock, Mock, Mock, DummyConfig],
+) -> None:
+    application = make_application(dependencies)
+    app_state, navigation, controller, event_loop, config = dependencies
+
+    result = application.run()
+
+    assert result == 7
+    assert config.logger.messages == ["Starting PTH Fausta 0.1.0."]
+    app_state.start.assert_called_once_with()
+    navigation.navigate_to.assert_called_once_with(controller)
+    event_loop.run.assert_called_once_with()
+
+
+def test_shutdown_closes_controller_state_and_event_loop(
+    dependencies: tuple[Mock, Mock, Mock, Mock, DummyConfig],
+) -> None:
+    application = make_application(dependencies)
+    app_state, navigation, _, event_loop, config = dependencies
+
+    application.shutdown()
+
+    navigation.close_current.assert_called_once_with()
+    app_state.stop.assert_called_once_with()
+    event_loop.quit.assert_called_once_with()
+    assert config.logger.messages == ["Application shutdown completed."]
+
+
+def test_execute_returns_event_loop_exit_code(
+    dependencies: tuple[Mock, Mock, Mock, Mock, DummyConfig],
+) -> None:
+    assert make_application(dependencies).execute() == 7
+
+
+def test_execute_always_invokes_shutdown(
+    dependencies: tuple[Mock, Mock, Mock, Mock, DummyConfig],
+) -> None:
+    application = make_application(dependencies)
+    application.run = Mock(side_effect=RuntimeError("boom"))  # type: ignore[method-assign]
+    application.shutdown = Mock()  # type: ignore[method-assign]
+
+    with pytest.raises(RuntimeError, match="boom"):
+        application.execute()
+
+    application.shutdown.assert_called_once_with()
+
+
+def test_core_application_has_no_qt_or_mvc_imports() -> None:
+    source = (ROOT / "src" / "app" / "core" / "app.py").read_text(encoding="utf-8")
+
+    assert "PySide6" not in source
+    assert "app.controllers" not in source
+    assert "app.views" not in source

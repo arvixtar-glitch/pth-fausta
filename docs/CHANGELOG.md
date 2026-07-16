@@ -1,5 +1,20 @@
 # PTH Fausta - Pakeitimų istorija
 
+## v0.1.3 (2026-07-16)
+
+### Pridėta
+
+* Sukurtas `src/app/bootstrap.py` ir įgyvendintas Composition Root.
+* Prijungtos vienintelė `QApplication` ir `QtEventLoop` instancijos.
+* Sukurti, sujungti ir konteineryje registruoti pagrindiniai programos komponentai.
+* `main.py` prijungtas prie Composition Root.
+* Pridėti Composition Root testai.
+
+### Patikrinimas
+
+* Visas testų rinkinys praeina: 185 testai ir 8 subtestai.
+* `ruff check .` ir `git diff --check` praeina be klaidų.
+
 ## v0.1.2 (2026-07-16)
 
 ### Pridėta

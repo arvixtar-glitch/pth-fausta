@@ -118,7 +118,7 @@ Negali:
 
 ## Programuotojas
 
-**Codeium**
+**Codex**
 
 Atsakomybės:
 

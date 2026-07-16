@@ -32,7 +32,7 @@
 * [x] Sukurti ServiceContainer.
 * [x] Sukurti AppState.
 * [x] Composition Root planas parengtas (dokumentavimas).
-* [ ] Sukurti `src/app/bootstrap.py` – Composition Root įgyvendinimas laukia MainView ir AppController integravimo.
+* [x] Sukurti `src/app/bootstrap.py` – Composition Root įgyvendinimas.
 
 ---
 

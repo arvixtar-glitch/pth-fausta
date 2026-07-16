@@ -5,7 +5,7 @@
 **Būsena:** Aktyvus
 **Autorius:** Produkto savininkas ir DI komanda
 **Sukūrimo data:** 2026-07-14
-**Paskutinis atnaujinimas:** 2026-07-14
+**Paskutinis atnaujinimas:** 2026-07-16
 
 # AI_TEAM.md
 
@@ -24,7 +24,7 @@ Jo tikslai:
 * išvengti prieštaringų sprendimų;
 * išlaikyti vieningą architektūrą viso projekto gyvavimo metu.
 
-Šis dokumentas yra pagrindinis projekto organizavimo dokumentas.
+* Šis dokumentas yra pagrindinis projekto organizavimo dokumentas.
 
 ---
 
@@ -364,3 +364,103 @@ Produkto savininko, architekto ir kitų komandos narių tarpusavio bendravimas, 
 | Versija | Data | Pakeitimai |
 |---------|------|------------|
 | 1.0 | 2026-07-14 | Sukurtas pradinis AI komandos darbo taisyklių dokumentas. |
+
+pataisyta lentelės versija:
+| Versija | Data | Patvirtino | Pakeitimai |
+| ------- | ---- | ---------- | ---------- |
+
+
+
+# Papildymai AI_TEAM.md (v1.1)
+
+## 17. Projekto vizija
+
+**PTH Fausta** kuriama kaip modulinė verslo dokumentų valdymo sistema, skirta Lietuvos rinkai.
+
+Pagrindinė sistemos paskirtis – leisti kurti, numeruoti, saugoti, analizuoti, spausdinti, siųsti ir valdyti verslo dokumentus bei jų istoriją.
+
+Sistema projektuojama taip, kad ateityje būtų galima lengvai pridėti naujus dokumentų tipus, funkcijas ir modulius nekeičiant jau veikiančios architektūros.
+
+---
+
+## 18. Dokumentacijos architektas
+
+Šis vaidmuo pakeičia ankstesnį „Dokumentacijos prižiūrėtojo“ pavadinimą. 
+
+Dokumentacijos architektas atsakingas už visos projekto dokumentacijos struktūros nuoseklumą.
+
+Atsakomybės:
+
+* prižiūri `docs/` katalogo struktūrą;
+* užtikrina dokumentų tarpusavio suderinamumą;
+* siūlo dokumentacijos pakeitimus po svarbių architektūrinių sprendimų;
+* užtikrina, kad dokumentacija atspindėtų faktinę projekto būseną.
+
+Šiuo metu šias pareigas vykdo **ChatGPT**.
+
+---
+
+## 19. Stabilumo principas
+
+Esama veikianti funkcija neturi būti keičiama be aiškios techninės arba verslo priežasties.
+
+Kiekvienas pakeitimas turi būti vertinamas pagal jo poveikį jau veikiančiai sistemai.
+
+Naujas funkcionalumas kuriamas taip, kad kuo mažiau paveiktų esamus modulius.
+
+Pirmenybė teikiama architektūros stabilumui ir atgaliniam suderinamumui.
+
+---
+
+## 20. Architektūrinių pakeitimų vertinimas
+
+Prieš siūlydami architektūrinius pakeitimus, visi DI komandos nariai privalo įvertinti:
+
+* poveikį jau veikiančiam kodui;
+* poveikį dokumentacijai;
+* suderinamumą su galiojančia architektūra;
+* ilgalaikę naudą projektui.
+
+Architektūriniai pakeitimai neturi būti atliekami vien dėl naujesnių technologijų ar alternatyvių DI pasiūlymų.
+
+---
+
+## 21. Lokalizacijos principas
+
+Programos vidinis kodas kuriamas anglų kalba.
+
+Naudotojui matomi tekstai (mygtukai, meniu, pranešimai, dokumentų pavadinimai ir kt.) pagal numatytuosius nustatymus kuriami lietuvių kalba.
+
+Naudotojo sąsaja projektuojama taip, kad ateityje būtų galima pridėti papildomas kalbas nekeičiant programos verslo logikos.
+
+---
+
+## 22. Projekto būsenos dokumentavimas
+
+`AI_TEAM.md` aprašo ilgalaikes projekto darbo taisykles.
+
+Einamoji projekto būsena, atlikti darbai ir pasiekta pažanga šiame dokumente nefiksuojami.
+
+Tam naudojami:
+
+* `PROJECT_LOG.md` – projekto darbų žurnalas;
+* `CHANGELOG.md` – funkcinių pakeitimų istorija;
+* `TASKS.md` – vykdomų darbų sąrašas.
+
+---
+
+## 23. Versijų istorijos papildymas
+
+Nuo šios versijos rekomenduojama versijų istorijos lentelę papildyti stulpeliu **„Patvirtino“**, kad būtų aišku, kas patvirtino reikšmingus dokumento pakeitimus.
+
+Rekomenduojama lentelės struktūra:
+
+| Versija | Data | Patvirtino | Pakeitimai |
+| ------- | ---- | ---------- | ---------- |
+
+---
+
+# Versijų istorijos papildymas
+
+| Versija | Data | Tvirtino | Pakeitimai |                                                                                      
+| 1.1     | 2026-07-16 | Savinikas | Papildyta projekto vizija, įvestas dokumentacijos architekto vaidmuo, stabilumo principas, architektūrinių pakeitimų vertinimo taisyklės, lokalizacijos principas ir projekto būsenos dokumentavimo tvarka. |

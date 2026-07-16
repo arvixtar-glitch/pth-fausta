@@ -22,7 +22,7 @@
 
 * [x] Sukurti MVC architektūros pagrindą.
 * [x] Sukurti bazines Controller klases.
-* [ ] Sukurti bazines Service klases.
+* [x] Sukurti bazinę `BaseService` klasę.
 * [ ] Sukurti bazines Repository klases.
 * [x] Sukurti bazines Model klases.
 * [x] Sukurti View infrastruktūrą.
@@ -44,7 +44,15 @@
 
 ---
 
-## 4 etapas – Verslo moduliai
+## 4 etapas – Business Layer Foundation 🔄
+
+* [x] Task 4.1 – sukurti bazinę `BaseService` klasę.
+* [ ] Task 4.2 – sukurti bazinę `BaseRepository` klasę.
+* [ ] Formalizuoti Service–Repository priklausomybių taisykles.
+
+---
+
+## 5 etapas – Verslo moduliai
 
 * [ ] Klientai.
 * [ ] Pardavėjas.

@@ -1,5 +1,17 @@
 # PTH Fausta - Pakeitimų istorija
 
+## Nepaskelbta
+
+### Pridėta
+
+#### Business Layer Foundation
+
+* Pradėtas 4 etapas – Business Layer Foundation.
+* Sukurta minimali bazinė `BaseService` klasė būsimiems verslo servisams.
+* `BaseService` eksportuota per `app.services` paketą.
+* Pridėti bazinės servisų klasės architektūrinių ribų testai.
+* `BaseRepository` dar nesukurta; Service–Repository priklausomybių taisyklės bus formalizuotos vėlesnėje užduotyje.
+
 ## v0.1.3 (2026-07-16)
 
 ### Pridėta

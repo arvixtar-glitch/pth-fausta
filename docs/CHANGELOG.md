@@ -1,5 +1,36 @@
 # PTH Fausta - Pakeitimų istorija
 
+## v0.1.2 (2026-07-16)
+
+### Pridėta
+
+#### AppState
+
+* Pridėtas `AppState` bendros programos būsenos valdymui.
+* Pridėtas programos veikimo būsenos valdymas (`start()`, `stop()`).
+* Pridėtas aktyvaus naudotojo būsenos valdymas (`set_current_user()`, `clear_current_user()`).
+* Pridėtas aktyvaus dokumento būsenos valdymas (`set_active_document()`, `clear_active_document()`).
+* Pridėtas neišsaugotų pakeitimų žymėjimas (`mark_unsaved_changes()`, `mark_changes_saved()`).
+* Pridėta `reset()` metoda visai būsenai atkurti.
+* Sukurti `AppState` vienetiniai testai (42 testai).
+* Atnaujinti `app.core` paketų eksportai `AppState` įtraukimui.
+
+#### Composition Root planas
+
+* Pridėtas `COMPOSITION_ROOT.md` detalus komponentų sujungimo planas.
+* Sukurtas ADR-001 su Composition Root vietos sprendimu.
+* Aprašyta dabartinė programos paleidimo seka.
+* Aprašyta planuojama komponentų kūrimo ir registravimo seka.
+* Aprašyta programos paleidimo ir uždarymo seka su išimčių valdymu.
+* Dokumentuotos leidžiamos ir draudžiamos priklausomybės.
+* Sprendimas: Composition Root bus atskirame `src/app/bootstrap.py` modulyje (dar neįgyvendintas).
+* Patikslinta: `bootstrap.py` vieta yra `src/app/`, ne `src/app/core/`, nes tai aukščiausio lygio programos surinkimas, ne Core infrastruktūra.
+
+### Patikrinimas
+
+* Patikrintas `AppState` elgesys naudojant `pytest` (179 testų iš viso).
+* Projektas toliau veikia be pakeitimų.
+
 ## v0.1.1 (2026-07-15)
 
 ### Pridėta

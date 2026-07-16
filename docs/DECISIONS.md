@@ -229,6 +229,36 @@ Galioja.
 
 ---
 
+## DEC-011
+
+**Data:** 2026-07-16
+
+**Sprendimas**
+
+Composition Root (komponentų kūrimas ir sujungimas) bus atliktas atskirame `src/app/bootstrap.py` modulyje (o ne `src/app/core/bootstrap.py`).
+
+**Priežastis**
+
+1. **Single Responsibility Principle**: `Application` valdo gyvavimo ciklą, `bootstrap` valdo komponentų sukūrimą ir registravimą. Tai geriau testuojama, plečiama ir suprasti.
+
+2. **Core nepriklausomybė**: `bootstrap.py` importuos konkrečius verslo komponentus (`AppController`, `MainView`), todėl negali būti `core` pakete. `app.core` turi likti nepriklausomas nuo aukštesnių sluoksnių.
+
+3. **Teisingos priklausomybės kryptis**:
+   ```
+   main.py → bootstrap.py (aukščiausias) → konkreti logika → Core
+   ```
+   Jei `bootstrap` būtų `core/bootstrap.py`, gautume atvirkštinę priklausomybę (Core → verslo logika).
+
+**Nuoroda**
+
+Žr. `adr/ADR-001-composition-root.md` dėl detalaus pasirinkimo pagrindimo.
+
+**Būsena**
+
+Galioja (tik sprendimas, neįgyvendintas).
+
+---
+
 # 4. Sprendimų būsenos
 
 Naudojamos šios būsenos:

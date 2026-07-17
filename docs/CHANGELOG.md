@@ -10,7 +10,11 @@
 * Sukurta minimali bazinė `BaseService` klasė būsimiems verslo servisams.
 * `BaseService` eksportuota per `app.services` paketą.
 * Pridėti bazinės servisų klasės architektūrinių ribų testai.
-* `BaseRepository` dar nesukurta; Service–Repository priklausomybių taisyklės bus formalizuotos vėlesnėje užduotyje.
+* Užbaigtas Task 4.2 – sukurtas minimalus `BaseRepository` pagrindas.
+* `BaseRepository` sukurta be SQLite, SQLAlchemy ir kitų persistence technologijų.
+* Bazinė klasė sąmoningai neturi bendrų CRUD metodų.
+* Service–Repository priklausomybių taisyklės bus formalizuotos per Task 4.3.
+* Konkreti persistence infrastruktūra bus kuriama vėlesniame etape.
 
 ## v0.1.3 (2026-07-16)
 

@@ -52,7 +52,17 @@
 
 ---
 
-## 5 etapas – Verslo moduliai
+## 5 etapas – Persistence Foundation 🔄
+
+* [x] Task 5.1 – sukurti persistence konfigūracijos pagrindą.
+* [ ] Sukurti SQLAlchemy engine infrastruktūrą.
+* [ ] Sukurti sesijų fabriką.
+* [ ] Sukurti ORM bazę ir modelius.
+* [ ] Sukurti Alembic migracijų infrastruktūrą.
+
+---
+
+## 6 etapas – Verslo moduliai
 
 * [ ] Klientai.
 * [ ] Pardavėjas.

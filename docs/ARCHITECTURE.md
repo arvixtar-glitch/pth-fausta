@@ -2,7 +2,7 @@
 
 **Projektas:** PTH Fausta
 **Dokumentas:** ARCHITECTURE.md
-**Versija:** 1.1
+**Versija:** 1.2
 **Būsena:** Aktyvus
 **Autorius:** Produkto savininkas ir DI komanda
 **Sukūrimo data:** 2026-07-14
@@ -205,10 +205,15 @@ Verslo logika projektuojama taip, kad ją būtų galima testuoti nepriklausomai 
 Grafinė sąsaja neturi turėti verslo logikos.
 
 Architektūriniai testai rekursyviai analizuoja visų Repository, Service,
-Controller, Model ir View modulių importus. Todėl tos pačios priklausomybių
+Controller, Model, View ir Persistence modulių importus. Todėl tos pačios priklausomybių
 taisyklės automatiškai taikomos ir ateityje sukurtiems šių sluoksnių moduliams.
 Testai turi pateikti pažeidimą sukėlusį failą ir importą, kad sluoksnių ribų
 pažeidimai būtų aptikti dar prieš integruojant pakeitimą.
+
+Persistence konfigūracijos pagrindas yra `app.persistence` pakete. Jis aprašo
+SQLite DB failo bei susijusių katalogų vietas, tačiau nekuria engine, sesijų,
+ORM lentelių, migracijų ar DB failo. Patvirtinta būsimos duomenų bazės kryptis
+detaliau aprašyta `DATABASE.md`.
 
 ---
 
@@ -259,5 +264,6 @@ Kasdieniai programavimo darbai šiame dokumente nefiksuojami.
 
 | Versija | Data       | Pakeitimai                                           |
 | ------- | ---------- | ---------------------------------------------------- |
+| 1.2     | 2026-07-17 | Dokumentuotas persistence konfigūracijos pagrindas.  |
 | 1.1     | 2026-07-17 | Formalizuotos sluoksnių priklausomybės ir jų testai. |
 | 1.0     | 2026-07-14 | Sukurtas pradinis sistemos architektūros dokumentas. |

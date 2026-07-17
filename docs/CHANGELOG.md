@@ -4,6 +4,17 @@
 
 ### Pridėta
 
+#### Persistence Foundation
+
+* Pradėtas 5 etapas – Persistence Foundation.
+* Sukurtas `app.persistence` paketas ir nekintamas `DatabaseConfig` objektas.
+* Apibrėžta numatytoji `data/` katalogų struktūra ir SQLite URL generavimas.
+* Katalogai kuriami tik aiškiai iškvietus `ensure_directories()`; DB failas
+  nekuriamas.
+* Pridėti konfigūracijos validacijos, failų sistemos ir Windows kelių testai.
+* Architektūrinė priklausomybių patikra išplėsta persistence sluoksniui.
+* Sukurtas `DATABASE.md` su patvirtinta būsimos DB schemos kryptimi.
+
 #### Business Layer Foundation
 
 * Pradėtas 4 etapas – Business Layer Foundation.

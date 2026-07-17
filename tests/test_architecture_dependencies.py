@@ -21,6 +21,10 @@ LAYER_RULES = (
     ("controllers", ("app.repositories",)),
     ("models", ("app.views", *QT_MODULES)),
     ("views", ("app.repositories",)),
+    (
+        "persistence",
+        ("app.controllers", "app.services", "app.views", *QT_MODULES),
+    ),
 )
 
 

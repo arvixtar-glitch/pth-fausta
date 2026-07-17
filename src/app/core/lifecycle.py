@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 
 class ApplicationStatePort(Protocol):
@@ -15,6 +15,7 @@ class ApplicationStatePort(Protocol):
         """Mark the application state as stopped."""
 
 
+@runtime_checkable
 class ControllerPort(Protocol):
     """Define controller lifecycle operations."""
 

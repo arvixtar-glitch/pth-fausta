@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from app.controllers.base_controller import BaseController
+from app.core.lifecycle import ControllerPort
 
 
 class NavigationService:
@@ -10,10 +10,10 @@ class NavigationService:
 
     def __init__(self) -> None:
         """Initialize the service without an active controller."""
-        self._current_controller: BaseController | None = None
+        self._current_controller: ControllerPort | None = None
 
     @property
-    def current_controller(self) -> BaseController | None:
+    def current_controller(self) -> ControllerPort | None:
         """Return the currently active controller or None."""
         return self._current_controller
 
@@ -22,10 +22,10 @@ class NavigationService:
         """Return whether there is an active controller."""
         return self._current_controller is not None
 
-    def navigate_to(self, controller: BaseController) -> None:
+    def navigate_to(self, controller: ControllerPort) -> None:
         """Switch to another controller by stopping the current one and starting the new one."""
-        if not isinstance(controller, BaseController):
-            raise TypeError("controller must be an instance of BaseController")
+        if not isinstance(controller, ControllerPort):
+            raise TypeError("controller must implement ControllerPort")
 
         if self._current_controller is controller:
             return

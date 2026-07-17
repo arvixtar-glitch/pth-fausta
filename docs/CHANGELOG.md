@@ -13,7 +13,11 @@
 * Užbaigtas Task 4.2 – sukurtas minimalus `BaseRepository` pagrindas.
 * `BaseRepository` sukurta be SQLite, SQLAlchemy ir kitų persistence technologijų.
 * Bazinė klasė sąmoningai neturi bendrų CRUD metodų.
-* Service–Repository priklausomybių taisyklės bus formalizuotos per Task 4.3.
+* Užbaigtas Task 4.3 – formalizuotos sluoksnių priklausomybių taisyklės.
+* Pridėti rekursyviniai architektūriniai testai, automatiškai tikrinantys ir
+  būsimus Repository, Service, Controller, Model bei View modulius.
+* `NavigationService` priklausomybė nuo konkretaus kontrolerio pakeista į
+  neutralią Core `ControllerPort` sąsają.
 * Konkreti persistence infrastruktūra bus kuriama vėlesniame etape.
 
 ## v0.1.3 (2026-07-16)

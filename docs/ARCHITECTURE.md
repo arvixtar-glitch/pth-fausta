@@ -2,11 +2,11 @@
 
 **Projektas:** PTH Fausta
 **Dokumentas:** ARCHITECTURE.md
-**Versija:** 1.0
+**Versija:** 1.1
 **Būsena:** Aktyvus
 **Autorius:** Produkto savininkas ir DI komanda
 **Sukūrimo data:** 2026-07-14
-**Paskutinis atnaujinimas:** 2026-07-14
+**Paskutinis atnaujinimas:** 2026-07-17
 
 ---
 
@@ -113,17 +113,32 @@ Kiekvienas sluoksnis atsako tik už savo funkcijas.
 
 # 7. Priklausomybių taisyklės
 
+Sluoksnių priklausomybės gali būti nukreiptos tik žemyn:
+
+```text
+View → Controller → Service → Repository → Persistence
+```
+
 Leidžiamos priklausomybės:
 
-GUI → Valdymo sluoksnis
+* Controller gali naudoti Service;
+* Service gali naudoti Repository;
+* Repository ateityje galės naudoti patvirtintą persistence infrastruktūrą;
+* priklausomybės konkretiems komponentams perduodamos per konstruktorius;
+* Composition Root gali importuoti ir sujungti visų sluoksnių konkrečius komponentus.
 
-Valdymo sluoksnis → Verslo logika
+Draudžiamos priklausomybės:
 
-Verslo logika → Duomenų prieiga
+* Repository negali importuoti Controller, Service, View, NavigationService ar Qt;
+* Service negali importuoti Controller, View ar Qt;
+* Controller negali tiesiogiai importuoti Repository;
+* Model negali importuoti View ar Qt;
+* View negali importuoti Repository;
+* žemesnis sluoksnis negali importuoti aukštesnio sluoksnio.
 
-Duomenų prieiga → SQLite
-
-Atvirkštinės priklausomybės neleidžiamos.
+Controller su duomenų prieiga dirba tik per Service sluoksnį. Verslo logika
+priklauso Service, o ne Controller, View ar Repository sluoksniui. Qt ir PySide6
+naudojami tik UI bei tam skirtoje infrastruktūroje.
 
 ---
 
@@ -189,6 +204,12 @@ Verslo logika projektuojama taip, kad ją būtų galima testuoti nepriklausomai 
 
 Grafinė sąsaja neturi turėti verslo logikos.
 
+Architektūriniai testai rekursyviai analizuoja visų Repository, Service,
+Controller, Model ir View modulių importus. Todėl tos pačios priklausomybių
+taisyklės automatiškai taikomos ir ateityje sukurtiems šių sluoksnių moduliams.
+Testai turi pateikti pažeidimą sukėlusį failą ir importą, kad sluoksnių ribų
+pažeidimai būtų aptikti dar prieš integruojant pakeitimą.
+
 ---
 
 # 11. Klaidų valdymas
@@ -238,4 +259,5 @@ Kasdieniai programavimo darbai šiame dokumente nefiksuojami.
 
 | Versija | Data       | Pakeitimai                                           |
 | ------- | ---------- | ---------------------------------------------------- |
+| 1.1     | 2026-07-17 | Formalizuotos sluoksnių priklausomybės ir jų testai. |
 | 1.0     | 2026-07-14 | Sukurtas pradinis sistemos architektūros dokumentas. |

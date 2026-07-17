@@ -48,7 +48,7 @@
 
 * [x] Task 4.1 – sukurti bazinę `BaseService` klasę.
 * [x] Task 4.2 – sukurti bazinę `BaseRepository` klasę.
-* [ ] Formalizuoti Service–Repository priklausomybių taisykles.
+* [x] Task 4.3 – formalizuoti architektūros priklausomybių taisykles ir testus.
 
 ---
 

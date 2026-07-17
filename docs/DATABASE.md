@@ -1,15 +1,15 @@
 # PTH Fausta – Duomenų bazės architektūra
 
 **Dokumentas:** DATABASE.md  
-**Versija:** 1.0  
+**Versija:** 1.1
 **Būsena:** Patvirtinta kryptis  
 **Data:** 2026-07-17
 
 ## Paskirtis
 
 Šis dokumentas apibrėžia patvirtintą persistence technologijų ir būsimos
-verslo duomenų schemos kryptį. Task 5.1 įgyvendina tik konfigūracijos pagrindą:
-DB engine, sesijos, ORM lentelės, migracijos ir tikras DB failas dar nekuriami.
+verslo duomenų schemos kryptį. Task 5.2 įgyvendina SQLAlchemy engine ir sesijų
+gamybos pagrindą; ORM lentelės bei migracijos dar nekuriamos.
 
 ## Technologinė kryptis
 
@@ -29,6 +29,66 @@ data/
 
 `DatabaseConfig` aprašo šiuos kelius, tačiau katalogus sukuria tik aiškiai
 iškvietus `ensure_directories()`. Šis metodas DB failo nekuria.
+
+## SQLAlchemy ryšio infrastruktūra
+
+Naudojama SQLAlchemy 2.x. `DatabaseEngine` gauna vienintelį URL šaltinį iš
+`DatabaseConfig.database_url` ir sukuria vieną SQLAlchemy `Engine` su:
+
+```python
+connect_args={"check_same_thread": False}
+```
+
+Šis SQLite nustatymas leidžia ateityje skirtingose darbalaukio programos gijose
+kurti atskirus ryšius. Jis nepadaro vienos SQLAlchemy `Session` saugios naudoti
+keliose gijose: kiekviena darbo operacija ar gija privalo turėti atskirą sesiją.
+
+SQLAlchemy `connect` eventas kiekvienam naujam DBAPI ryšiui įvykdo:
+
+```sql
+PRAGMA foreign_keys = ON
+```
+
+Todėl foreign-key apribojimai įjungiami centralizuotai, o ne atskirose
+repository operacijose.
+
+Katalogų paruošimas lieka kviečiančio kodo atsakomybė:
+
+```python
+config.ensure_directories()
+database_engine = DatabaseEngine(config)
+```
+
+Vien konfigūracijos, katalogų ar engine objekto sukūrimas SQLite failo nekuria.
+Failas sukuriamas pirmą kartą realiai užmezgus ryšį. `dispose()` atlaisvina
+engine pool šiuo metu laikomus ryšius ir gali būti saugiai kviečiamas dar kartą;
+metodas nėra negrįžtamas engine objekto sunaikinimas.
+
+## Sesijų gamybos politika
+
+`SessionFactory` priima SQLAlchemy `Engine` ir kiekvienu `create_session()`
+kvietimu grąžina naują, atskirą sesiją. Naudojama ši `sessionmaker`
+konfigūracija:
+
+```python
+sessionmaker(
+    bind=engine,
+    autoflush=False,
+    expire_on_commit=False,
+)
+```
+
+`autoflush=False` palieka flush valdymą aiškiam būsimam repository ar
+transakcijų sluoksniui. `expire_on_commit=False` išlaiko jau įkeltas objektų
+reikšmes po commit, tačiau neleidžia remtis lazy loading už uždarytos sesijos
+ribų.
+
+`SessionFactory.session()` kontekstas garantuoja tik sesijos uždarymą. Jis
+automatiškai nevykdo `commit()` ar `rollback()` ir neslepia išimčių. Verslo
+transakcijų ribos bei Unit of Work politika šiame etape dar neapibrėžtos.
+
+Globali sesija ir vienos sesijos dalijimas tarp UI, servisų, repository ar gijų
+draudžiamas.
 
 ## Pagrindiniai schemos blokai
 
@@ -138,9 +198,10 @@ paskirstymą keliems dokumentams ir dokumento apmokėjimą keliais mokėjimais.
 
 ## Įgyvendinimo etapai
 
-SQLAlchemy engine, sesijų fabrikas, ORM modeliai ir Alembic migracijos bus
-kuriami atskirose vėlesnėse 5 etapo užduotyse. Jų negalima perkelti į verslo,
-Controller ar UI sluoksnius.
+SQLAlchemy engine ir sesijų fabrikas įgyvendinti kaip izoliuoti persistence
+komponentai, tačiau dar neprijungti prie Composition Root. ORM bazė, modeliai,
+transakcijų politika ir Alembic migracijos bus kuriami atskirose vėlesnėse
+5 etapo užduotyse. Jų negalima perkelti į verslo, Controller ar UI sluoksnius.
 
 ## Susiję dokumentai
 

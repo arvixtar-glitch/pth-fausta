@@ -55,9 +55,9 @@
 ## 5 etapas – Persistence Foundation 🔄
 
 * [x] Task 5.1 – sukurti persistence konfigūracijos pagrindą.
-* [ ] Sukurti SQLAlchemy engine infrastruktūrą.
-* [ ] Sukurti sesijų fabriką.
-* [ ] Sukurti ORM bazę ir modelius.
+* [x] Task 5.2 – sukurti SQLAlchemy engine ir sesijų fabriką.
+* [ ] Task 5.3 – sukurti ORM Base ir metadata pagrindą.
+* [ ] Sukurti ORM modelius.
 * [ ] Sukurti Alembic migracijų infrastruktūrą.
 
 ---

@@ -2,7 +2,7 @@
 
 **Projektas:** PTH Fausta
 **Dokumentas:** ARCHITECTURE.md
-**Versija:** 1.2
+**Versija:** 1.3
 **Būsena:** Aktyvus
 **Autorius:** Produkto savininkas ir DI komanda
 **Sukūrimo data:** 2026-07-14
@@ -211,9 +211,12 @@ Testai turi pateikti pažeidimą sukėlusį failą ir importą, kad sluoksnių r
 pažeidimai būtų aptikti dar prieš integruojant pakeitimą.
 
 Persistence konfigūracijos pagrindas yra `app.persistence` pakete. Jis aprašo
-SQLite DB failo bei susijusių katalogų vietas, tačiau nekuria engine, sesijų,
-ORM lentelių, migracijų ar DB failo. Patvirtinta būsimos duomenų bazės kryptis
-detaliau aprašyta `DATABASE.md`.
+SQLite DB failo bei susijusių katalogų vietas. `DatabaseEngine` valdo vieno
+SQLAlchemy engine sukūrimą ir pooled ryšių atlaisvinimą, o `SessionFactory`
+kuria naujas, tarpusavyje nedalijamas sesijas. Vienos `Session` negalima dalyti
+tarp gijų. ORM lentelės, migracijos ir transakcijų politika dar nesukurtos, o
+persistence komponentai dar neprijungti prie Composition Root. Detalesnės
+taisyklės aprašytos `DATABASE.md`.
 
 ---
 
@@ -264,6 +267,7 @@ Kasdieniai programavimo darbai šiame dokumente nefiksuojami.
 
 | Versija | Data       | Pakeitimai                                           |
 | ------- | ---------- | ---------------------------------------------------- |
+| 1.3     | 2026-07-17 | Dokumentuoti SQLAlchemy engine ir sesijų komponentai. |
 | 1.2     | 2026-07-17 | Dokumentuotas persistence konfigūracijos pagrindas.  |
 | 1.1     | 2026-07-17 | Formalizuotos sluoksnių priklausomybės ir jų testai. |
 | 1.0     | 2026-07-14 | Sukurtas pradinis sistemos architektūros dokumentas. |

@@ -14,6 +14,13 @@
 * Pridėti konfigūracijos validacijos, failų sistemos ir Windows kelių testai.
 * Architektūrinė priklausomybių patikra išplėsta persistence sluoksniui.
 * Sukurtas `DATABASE.md` su patvirtinta būsimos DB schemos kryptimi.
+* SQLAlchemy priklausomybė apribota iki palaikomos 2.x versijos.
+* Sukurtas `DatabaseEngine` su SQLite `check_same_thread=False`, kiekvieno
+  ryšio `foreign_keys=ON` aktyvavimu ir aiškiu `dispose()` metodu.
+* Sukurtas `SessionFactory`, grąžinantis naujas sesijas su `autoflush=False` ir
+  `expire_on_commit=False`, bet automatiškai nevaldantis verslo transakcijų.
+* Pridėti engine, sesijų ir visos persistence infrastruktūros grandinės testai.
+* Papildyta SQLAlchemy ryšių, sesijų ir gijų naudojimo dokumentacija.
 
 #### Business Layer Foundation
 

@@ -10,20 +10,26 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 import app.repositories as repositories_package
+
 from app.repositories import BaseRepository as ExportedBaseRepository
+from app.repositories import CompanyRepository as ExportedCompanyRepository
 from app.repositories.base_repository import BaseRepository
+from app.repositories.company_repository import CompanyRepository
+
+
+def test_repositories_are_exported_from_repositories_package() -> None:
+    assert ExportedBaseRepository is BaseRepository
+    assert ExportedCompanyRepository is CompanyRepository
+    assert set(repositories_package.__all__) == {
+        "BaseRepository",
+        "CompanyRepository",
+    }
 
 
 def test_base_repository_can_be_instantiated() -> None:
     repository = BaseRepository()
 
     assert isinstance(repository, BaseRepository)
-
-
-def test_base_repository_is_exported_from_repositories_package() -> None:
-    assert ExportedBaseRepository is BaseRepository
-    assert repositories_package.__all__ == ["BaseRepository"]
-
 
 def test_base_repository_has_no_assumed_crud_operations() -> None:
     public_attributes = {

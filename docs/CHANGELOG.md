@@ -4,6 +4,26 @@
 
 ### Pridėta
 
+#### UI Foundation
+
+* Užbaigta Task 5.3A UI bazė pagal privalomą `UI_GUIDELINES.md`.
+* Pridėti centralizuoti dizaino žetonai ir bendra šviesios temos QSS sistema.
+* Pagrindiniame lange įgyvendinta suskleidžiama sidebar navigacija, darbo
+  sritis, pradinis puslapis ir DB bei versijos būsenos juosta.
+* Įmonės rekvizitų langas suskirstytas į logines grupes, pridėta fiksuota
+  veiksmų juosta, dirty būsena, atkūrimas, validacijos ir sąskaitų empty būsena.
+* Pridėti MainView, HomeView, CompanyView, sidebar, navigacijos ir temos testai.
+
+#### Company Profile
+
+* Užbaigtas Task 5.3 – sukurtas pilnas įmonės profilio vertikalus pjūvis.
+* Pridėti `companies` ir `company_bank_accounts` ORM modeliai bei jų ryšys.
+* Sukurti `CompanyRepository`, `CompanyService` ir `CompanyController`.
+* Įgyvendinta vienos numatytosios banko sąskaitos taisyklė.
+* Pridėtas laikinas funkcinis „Įmonės nustatymų“ langas su dviem skirtukais.
+* Modulis prijungtas prie Composition Root, `ServiceContainer` ir navigacijos.
+* Pridėti ORM, CRUD, verslo taisyklių, kontrolerio ir integracijos testai.
+
 #### Persistence Foundation
 
 * Pradėtas 5 etapas – Persistence Foundation.

@@ -1,15 +1,27 @@
 # PTH Fausta – Duomenų bazės architektūra
 
 **Dokumentas:** DATABASE.md  
-**Versija:** 1.1
+**Versija:** 1.2
 **Būsena:** Patvirtinta kryptis  
 **Data:** 2026-07-17
 
 ## Paskirtis
 
 Šis dokumentas apibrėžia patvirtintą persistence technologijų ir būsimos
-verslo duomenų schemos kryptį. Task 5.2 įgyvendina SQLAlchemy engine ir sesijų
-gamybos pagrindą; ORM lentelės bei migracijos dar nekuriamos.
+verslo duomenų schemos kryptį. Task 5.3 įgyvendina minimalų ORM pagrindą ir
+įmonės profilio lenteles; migracijos dar nekuriamos.
+
+## ORM pagrindas ir įmonės profilis
+
+`OrmBase` naudoja bendrą `MetaData` su deterministine pirminių, išorinių,
+unikalių raktų, indeksų ir apribojimų vardų konvencija. Sukurtos lentelės
+`companies` ir `company_bank_accounts`, susietos ryšiu vienas su daugeliu.
+Išorinis raktas turi `ON DELETE CASCADE`, o ORM ryšys – `delete-orphan` elgseną.
+
+Programoje saugomas vienas įmonės profilis. Banko sąskaitų gali būti kelios,
+tačiau verslo servisas užtikrina vieną numatytąją sąskaitą: pirmoji sąskaita
+ja tampa automatiškai, pasirinkus kitą ankstesnė atžymima, o pašalinus
+numatytąją pirmoji likusi sąskaita tampa numatytąja.
 
 ## Technologinė kryptis
 
@@ -198,10 +210,10 @@ paskirstymą keliems dokumentams ir dokumento apmokėjimą keliais mokėjimais.
 
 ## Įgyvendinimo etapai
 
-SQLAlchemy engine ir sesijų fabrikas įgyvendinti kaip izoliuoti persistence
-komponentai, tačiau dar neprijungti prie Composition Root. ORM bazė, modeliai,
-transakcijų politika ir Alembic migracijos bus kuriami atskirose vėlesnėse
-5 etapo užduotyse. Jų negalima perkelti į verslo, Controller ar UI sluoksnius.
+SQLAlchemy engine, sesijų fabrikas, ORM bazė ir įmonės profilio modeliai
+prijungti prie Composition Root. Paleidžiant programą įmonės lentelės
+sukuriamos per bendrą metadata. Alembic migracijos ir bendra Unit of Work
+politika bus kuriamos atskirose vėlesnėse 5 etapo užduotyse.
 
 ## Susiję dokumentai
 

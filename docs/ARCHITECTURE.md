@@ -2,7 +2,7 @@
 
 **Projektas:** PTH Fausta
 **Dokumentas:** ARCHITECTURE.md
-**Versija:** 1.3
+**Versija:** 1.4
 **Būsena:** Aktyvus
 **Autorius:** Produkto savininkas ir DI komanda
 **Sukūrimo data:** 2026-07-14
@@ -194,6 +194,18 @@ Repository
 SQLite
 ```
 
+Pirmasis pilnas vertikalus pjūvis yra įmonės profilio modulis:
+
+```text
+CompanyView → CompanyController → CompanyService → CompanyRepository
+            → SessionFactory → SQLAlchemy ORM → SQLite
+```
+
+`CompanyService` valdo įmonės profilio ir vienos numatytosios banko sąskaitos
+verslo taisykles. `CompanyRepository` valdo tik CRUD ir transakcijų užbaigimą.
+Modulis sujungiamas `bootstrap.py`, registruojamas `ServiceContainer`, o jo
+langas pasiekiamas per `Nustatymai → Įmonė`.
+
 Šis modelis taikomas visiems projekto moduliams.
 
 ---
@@ -214,9 +226,22 @@ Persistence konfigūracijos pagrindas yra `app.persistence` pakete. Jis aprašo
 SQLite DB failo bei susijusių katalogų vietas. `DatabaseEngine` valdo vieno
 SQLAlchemy engine sukūrimą ir pooled ryšių atlaisvinimą, o `SessionFactory`
 kuria naujas, tarpusavyje nedalijamas sesijas. Vienos `Session` negalima dalyti
-tarp gijų. ORM lentelės, migracijos ir transakcijų politika dar nesukurtos, o
-persistence komponentai dar neprijungti prie Composition Root. Detalesnės
-taisyklės aprašytos `DATABASE.md`.
+tarp gijų. Minimalus ORM pagrindas ir įmonės profilio lentelės jau sukurtos,
+o persistence komponentai prijungti prie Composition Root. Migracijos ir
+bendra transakcijų politika dar nesukurtos. Detalesnės taisyklės aprašytos
+`DATABASE.md`.
+
+## UI dizaino sistema
+
+`UI_GUIDELINES.md` yra privalomas vizualinių ir UI elgsenos sprendimų šaltinis
+visiems naujiems ekranams. Centralizuoti dizaino žetonai laikomi
+`app.ui.theme`, o bendras QSS generuojamas `app.ui.styles`. View klasės gali
+valdyti tik pateikimą, prieinamumą ir vizualines būsenas; verslo taisyklės
+lieka Service sluoksnyje.
+
+Pagrindinį langą sudaro viršutinė juosta, suskleidžiama sidebar navigacija,
+`QStackedWidget` darbo sritis ir DB būsenos bei versijos juosta. Kol kiti
+moduliai neįgyvendinti, aktyvūs tik pradinis puslapis ir įmonės rekvizitai.
 
 ---
 

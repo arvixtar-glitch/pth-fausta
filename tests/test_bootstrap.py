@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 import app.bootstrap as bootstrap_module
 from app.controllers.app_controller import AppController
+from app.controllers.company_controller import CompanyController
 from app.core.app import Application
 from app.core.app_state import AppState
 from app.core.event_bus import EventBus
@@ -20,6 +21,7 @@ from app.core.service_container import ServiceContainer
 from app.infrastructure.qt_event_loop import QtEventLoop
 from app.services.navigation_service import NavigationService
 from app.views.main_view import MainView
+from app.views.company_view import CompanyView
 
 
 class FakeQApplication:
@@ -32,6 +34,10 @@ class FakeQApplication:
         type(self).current = self
         type(self).creation_count += 1
         self.arguments = arguments
+        self.stylesheet = ""
+
+    def setStyleSheet(self, stylesheet: str) -> None:
+        self.stylesheet = stylesheet
 
     @classmethod
     def instance(cls) -> FakeQApplication | None:
@@ -62,6 +68,9 @@ def test_bootstrap_composes_and_registers_single_object_graph(
     monkeypatch.setattr(bootstrap_module, "ServiceContainer", CapturingContainer)
     monkeypatch.setattr(bootstrap_module.MainView, "show", Mock())
     monkeypatch.setattr(bootstrap_module.MainView, "__init__", lambda self: None)
+    monkeypatch.setattr(bootstrap_module.MainView, "on_open_company", Mock())
+    monkeypatch.setattr(bootstrap_module.CompanyView, "__init__", lambda self: None)
+    monkeypatch.setattr(bootstrap_module.CompanyView, "bind_controller", Mock())
 
     application = bootstrap_module.bootstrap()
 
@@ -70,13 +79,15 @@ def test_bootstrap_composes_and_registers_single_object_graph(
     assert container is not None
     assert FakeQApplication.creation_count == 1
     assert CapturingContainer.creation_count == 1
-    assert container.service_count == 6
+    assert container.service_count == 12
     assert container.resolve(AppState) is application.app_state
     assert container.resolve(EventBus) is not None
     assert container.resolve(NavigationService) is application.navigation_service
     assert container.resolve(MainView) is application.app_controller.view
     assert container.resolve(AppController) is application.app_controller
     assert container.resolve(QtEventLoop) is application.event_loop
+    assert isinstance(container.resolve(CompanyView), CompanyView)
+    assert isinstance(container.resolve(CompanyController), CompanyController)
     assert not container.is_registered(ServiceContainer)
     assert application.navigation_service.current_controller is None
     assert application.app_controller.is_running is False
@@ -88,6 +99,9 @@ def test_bootstrap_reuses_existing_qapplication(monkeypatch: MonkeyPatch) -> Non
     FakeQApplication.creation_count = 0
     monkeypatch.setattr(bootstrap_module, "QApplication", FakeQApplication)
     monkeypatch.setattr(bootstrap_module.MainView, "__init__", lambda self: None)
+    monkeypatch.setattr(bootstrap_module.MainView, "on_open_company", Mock())
+    monkeypatch.setattr(bootstrap_module.CompanyView, "__init__", lambda self: None)
+    monkeypatch.setattr(bootstrap_module.CompanyView, "bind_controller", Mock())
 
     application = bootstrap_module.bootstrap()
 

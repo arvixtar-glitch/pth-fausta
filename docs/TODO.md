@@ -56,8 +56,8 @@
 
 * [x] Task 5.1 – sukurti persistence konfigūracijos pagrindą.
 * [x] Task 5.2 – sukurti SQLAlchemy engine ir sesijų fabriką.
-* [ ] Task 5.3 – sukurti ORM Base ir metadata pagrindą.
-* [ ] Sukurti ORM modelius.
+* [x] Task 5.3 – sukurti ORM Base, įmonės profilį ir banko sąskaitų modulį.
+* [x] Sukurti pirmuosius ORM modelius (`Company`, `CompanyBankAccount`).
 * [ ] Sukurti Alembic migracijų infrastruktūrą.
 
 ---

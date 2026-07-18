@@ -6,6 +6,9 @@
 
 #### Customer Module
 
+* Pataisyta Task 6.0C navigacijos regresija: sidebar darbo srities perėjimai
+  nebenaudoja programos lygio `NavigationService`, todėl `AppController` ir
+  `MainView` lieka aktyvūs pereinant tarp Pradžios ir Klientų puslapių.
 * Užbaigta Task 6.0B – įgyvendintas pilnas klientų modulio vertikalus pjūvis.
 * Pridėta `clients` ORM schema, `CustomerRepository`, `CustomerService` ir
   `CustomerController` su CRUD, validacija, dublikatų kontrole, momentine

@@ -8,6 +8,7 @@ from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
+from unittest.mock import Mock
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,6 +19,8 @@ from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import QApplication
 
 from app.models.customer import Customer
+from app.controllers.app_controller import AppController
+from app.services.navigation_service import NavigationService
 from app.views.customer_dialog import CustomerDialog
 from app.views.customer_list_view import CustomerListView
 from app.views.main_view import MainView
@@ -149,3 +152,46 @@ def test_customer_workspace_navigation(application: QApplication) -> None:
     assert main.workspace.currentWidget() is main.home_view
     assert main.home_button.isChecked()
     main.close()
+
+
+def test_sidebar_navigation_keeps_application_controller_alive(
+    application: QApplication, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    main = MainView()
+    customers = CustomerListView()
+    main.set_customer_view(customers)
+    refresh = Mock()
+    main.on_open_customers(lambda: (main.show_customers(), refresh()))
+    app_controller = AppController(main)
+    navigation = NavigationService()
+    original_close = main.close
+    monkeypatch.setattr(main, "close", Mock(wraps=original_close))
+    monkeypatch.setattr(app_controller, "stop", Mock(wraps=app_controller.stop))
+    monkeypatch.setattr(
+        navigation, "close_current", Mock(wraps=navigation.close_current)
+    )
+    navigation.navigate_to(app_controller)
+    application.processEvents()
+
+    main.customer_button.click()
+    application.processEvents()
+    assert main.workspace.currentWidget() is customers.widget
+    assert main.is_visible()
+    assert app_controller.is_running
+    assert navigation.current_controller is app_controller
+    assert QApplication.instance() is application
+    assert not application.closingDown()
+
+    main.home_button.click()
+    application.processEvents()
+    assert main.workspace.currentWidget() is main.home_view
+    main.customer_button.click()
+    application.processEvents()
+    assert main.workspace.currentWidget() is customers.widget
+    assert refresh.call_count == 2
+    main.close.assert_not_called()
+    app_controller.stop.assert_not_called()
+    navigation.close_current.assert_not_called()
+
+    original_close()
+    application.processEvents()

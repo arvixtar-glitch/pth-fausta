@@ -65,14 +65,12 @@ def bootstrap() -> Application:
     main_view.set_customer_view(customer_view)
     main_view.set_company_exists(company_service.get_company() is not None)
     company_controller.on_company_changed(main_view.set_company_exists)
-    main_view.on_open_home(navigation_service.close_current)
 
     def open_customers() -> None:
         main_view.show_customers()
-        navigation_service.navigate_to(customer_controller)
+        customer_controller.refresh()
 
     def open_company() -> None:
-        navigation_service.close_current()
         company_controller.start()
 
     main_view.on_open_customers(open_customers)

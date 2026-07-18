@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from app.controllers.base_controller import BaseController
 from app.services.company_service import CompanyService
 from app.views.company_view import CompanyView
@@ -13,7 +15,12 @@ class CompanyController(BaseController):
     def __init__(self, service: CompanyService, view: CompanyView) -> None:
         super().__init__(view)
         self._service = service
+        self._company_changed_callbacks: list[Callable[[bool], None]] = []
         view.bind_controller(self)
+
+    def on_company_changed(self, callback: Callable[[bool], None]) -> None:
+        """Notify a UI observer when the company profile existence changes."""
+        self._company_changed_callbacks.append(callback)
 
     def start(self) -> None:
         self.refresh()
@@ -22,6 +29,8 @@ class CompanyController(BaseController):
     def refresh(self) -> None:
         company = self._service.get_company()
         self.view.display_company(company)
+        for callback in self._company_changed_callbacks:
+            callback(company is not None)
         accounts = [] if company is None else self._service.list_bank_accounts()
         self.view.display_bank_accounts(accounts)
 

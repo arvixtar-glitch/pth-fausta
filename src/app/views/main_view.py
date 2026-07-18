@@ -11,6 +11,9 @@ from app.core.version import APP_VERSION
 from app.views.base_view import BaseView
 from app.views.home_view import HomeView
 
+SIDEBAR_EXPANDED_WIDTH = 273
+SIDEBAR_COLLAPSED_WIDTH = 64
+
 
 class MainView(BaseView):
     """Display the application header, navigation, workspace and status."""
@@ -29,6 +32,7 @@ class MainView(BaseView):
         body = QHBoxLayout()
         self.sidebar = QWidget()
         self.sidebar.setObjectName("sidebar")
+        self.sidebar.setFixedWidth(SIDEBAR_EXPANDED_WIDTH)
         self._sidebar_layout = QVBoxLayout(self.sidebar)
         self.collapse_button = QPushButton("☰  Suskleisti")
         self.collapse_button.setToolTip("Suskleisti navigaciją")
@@ -73,13 +77,22 @@ class MainView(BaseView):
         self.company_button.clicked.connect(callback)
         self.home_view.on_open_company(callback)
 
+    def set_company_exists(self, exists: bool) -> None:
+        """Update actions whose availability depends on a company profile."""
+        if hasattr(self, "home_view"):
+            self.home_view.set_company_exists(exists)
+
     def set_active_navigation(self, name: str) -> None:
         self.home_button.setChecked(name == "home")
         self.company_button.setChecked(name == "company")
 
     def toggle_sidebar(self) -> None:
         self._sidebar_collapsed = not self._sidebar_collapsed
-        self.sidebar.setFixedWidth(64 if self._sidebar_collapsed else 210)
+        self.sidebar.setFixedWidth(
+            SIDEBAR_COLLAPSED_WIDTH
+            if self._sidebar_collapsed
+            else SIDEBAR_EXPANDED_WIDTH
+        )
         for button in (self.home_button, self.company_button):
             text = (
                 button.property("iconText")

@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QTimer, Qt
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -138,6 +138,10 @@ class CompanyView(BaseView):
         self._snapshot: dict[str, str] = {}
         self._loading = False
         self._build_ui()
+        self._success_timer = QTimer(self._dialog)
+        self._success_timer.setSingleShot(True)
+        self._success_timer.setInterval(7_000)
+        self._success_timer.timeout.connect(self._clear_success_message)
         for editor in self._inputs.values():
             editor.textChanged.connect(self._update_dirty_state)
         self._status.currentTextChanged.connect(self._update_dirty_state)
@@ -152,11 +156,14 @@ class CompanyView(BaseView):
         tabs.addTab(self._accounts_tab(), "Banko sąskaitos")
         self.cancel_button = QPushButton("Atšaukti")
         self.save_button = QPushButton("Išsaugoti")
+        self.close_button = QPushButton("Uždaryti")
         self.save_button.setObjectName("primary")
         self.cancel_button.clicked.connect(self.restore_snapshot)
         self.save_button.clicked.connect(self._save_company)
+        self.close_button.clicked.connect(self.close)
         self.message_label = QLabel()
         action_bar = QHBoxLayout()
+        action_bar.addWidget(self.close_button)
         action_bar.addWidget(self.message_label)
         action_bar.addStretch()
         action_bar.addWidget(self.cancel_button)
@@ -282,7 +289,13 @@ class CompanyView(BaseView):
 
     def _update_dirty_state(self) -> None:
         if not self._loading:
+            self._clear_success_message()
             self._set_dirty(self._values() != self._snapshot)
+
+    def _clear_success_message(self) -> None:
+        if self.message_label.objectName() == "success":
+            self.message_label.clear()
+            self._success_timer.stop()
 
     def _set_dirty(self, dirty: bool) -> None:
         self.dirty_label.setText("Yra neišsaugotų pakeitimų" if dirty else "")
@@ -317,6 +330,7 @@ class CompanyView(BaseView):
         if self._run(self._controller.save_company, self._values()):
             self.message_label.setObjectName("success")
             self.message_label.setText("Įmonės duomenys išsaugoti.")
+            self._success_timer.start()
 
     def _selected_account(self) -> CompanyBankAccount | None:
         row = self._table.currentRow()

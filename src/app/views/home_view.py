@@ -10,11 +10,9 @@ class HomeView(QWidget):
 
     def __init__(self) -> None:
         super().__init__()
-        title = QLabel("Pradžia")
+        title = QLabel("PTH Fausta")
         title.setObjectName("h1")
-        description = QLabel(
-            "Tvarkykite įmonės rekvizitus ir naudokitės jau įdiegtais moduliais."
-        )
+        description = QLabel("Lietuviška dokumentų valdymo sistema")
         description.setObjectName("secondary")
         self.company_button = QPushButton("Įmonės rekvizitai")
         layout = QVBoxLayout(self)
@@ -27,3 +25,7 @@ class HomeView(QWidget):
 
     def on_open_company(self, callback: Callable[[], None]) -> None:
         self.company_button.clicked.connect(callback)
+
+    def set_company_exists(self, exists: bool) -> None:
+        """Only offer company setup while no company profile exists."""
+        self.company_button.setVisible(not exists)

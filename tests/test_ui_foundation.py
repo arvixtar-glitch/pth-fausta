@@ -19,7 +19,7 @@ from app.ui.styles import application_stylesheet
 from app.ui.theme import COLOR_PRIMARY, SPACING_MD
 from app.views.company_view import CompanyView
 from app.views.home_view import HomeView
-from app.views.main_view import MainView
+from app.views.main_view import SIDEBAR_EXPANDED_WIDTH, MainView
 
 
 @pytest.fixture(scope="module")
@@ -40,15 +40,27 @@ def test_home_view_opens_company(application: QApplication) -> None:
     assert calls == [True]
 
 
+def test_home_view_hides_company_action_when_company_exists(
+    application: QApplication,
+) -> None:
+    view = HomeView()
+    view.set_company_exists(False)
+    assert not view.company_button.isHidden()
+    view.set_company_exists(True)
+    assert view.company_button.isHidden()
+
+
 def test_main_view_sidebar_navigation_and_status(application: QApplication) -> None:
     view = MainView()
     view.set_active_navigation("company")
     assert view.sidebar is not None
     assert view.company_button.isChecked()
     assert "Duomenų bazė: prijungta" in view.status_label.text()
-    width = view.sidebar.width()
+    assert view.sidebar.width() == SIDEBAR_EXPANDED_WIDTH
     view.toggle_sidebar()
-    assert view.sidebar.width() != width
+    assert view.sidebar.width() != SIDEBAR_EXPANDED_WIDTH
+    view.toggle_sidebar()
+    assert view.sidebar.width() == SIDEBAR_EXPANDED_WIDTH
 
 
 def test_company_view_dirty_cancel_and_empty_state(application: QApplication) -> None:
@@ -62,6 +74,18 @@ def test_company_view_dirty_cancel_and_empty_state(application: QApplication) ->
     assert view.save_button.isEnabled()
     view.restore_snapshot()
     assert view._inputs["city"].text() == "Vilnius"
+
+
+def test_company_success_message_clears_when_editing(
+    application: QApplication,
+) -> None:
+    view = CompanyView()
+    view.display_company(Company(name="Fausta"))
+    view.message_label.setObjectName("success")
+    view.message_label.setText("Įmonės duomenys išsaugoti.")
+    view._inputs["city"].setText("Vilnius")
+    assert not view.message_label.text()
+    assert view.close_button.text() == "Uždaryti"
 
 
 def test_company_view_account_actions_follow_selection(

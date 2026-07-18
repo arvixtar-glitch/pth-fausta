@@ -50,6 +50,8 @@ def bootstrap() -> Application:
     company_view = CompanyView()
     company_controller = CompanyController(company_service, company_view)
     main_view = MainView()
+    main_view.set_company_exists(company_service.get_company() is not None)
+    company_controller.on_company_changed(main_view.set_company_exists)
     main_view.on_open_company(company_controller.start)
     app_controller = AppController(main_view)
 

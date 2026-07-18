@@ -15,6 +15,7 @@ def application_stylesheet() -> str:
         QLabel#secondary {{ color: {theme.COLOR_TEXT_SECONDARY}; }}
         QLabel#error {{ color: {theme.COLOR_ERROR}; }}
         QLabel#success {{ color: {theme.COLOR_SUCCESS}; }}
+        QLabel#warning {{ color: {theme.COLOR_WARNING}; }}
         QPushButton {{ padding: 7px 16px; border-radius: {theme.RADIUS_SM}px;
             border: 1px solid {theme.COLOR_BORDER_STRONG}; background: white; }}
         QPushButton:hover {{ border-color: {theme.COLOR_PRIMARY}; }}

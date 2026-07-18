@@ -64,7 +64,7 @@
 
 ## 6 etapas – Verslo moduliai
 
-* [ ] Klientai.
+* [x] Task 6.0B – Klientų modulis.
 * [ ] Pardavėjas.
 * [ ] Sąskaitos.
 * [ ] PDF generavimas.

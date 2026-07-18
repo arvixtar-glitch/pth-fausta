@@ -23,6 +23,7 @@ def test_repositories_are_exported_from_repositories_package() -> None:
     assert set(repositories_package.__all__) == {
         "BaseRepository",
         "CompanyRepository",
+        "CustomerRepository",
     }
 
 

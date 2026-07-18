@@ -1,0 +1,282 @@
+"""Modal customer editor following the shared card-dialog pattern."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import (
+    QButtonGroup,
+    QComboBox,
+    QGridLayout,
+    QHBoxLayout,
+    QLabel,
+    QMessageBox,
+    QPushButton,
+    QRadioButton,
+    QTabWidget,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+    QLineEdit,
+)
+
+from app.models.customer import (
+    CUSTOMER_STATUS_ACTIVE,
+    CUSTOMER_STATUS_INACTIVE,
+    CUSTOMER_TYPE_COMPANY,
+    CUSTOMER_TYPE_INDIVIDUAL,
+    Customer,
+)
+from app.views.dirty_state import DirtyStateTracker, GuardedDialog
+from app.views.form_components import form_field
+
+if TYPE_CHECKING:
+    from app.controllers.customer_controller import CustomerController
+
+
+class CustomerDialog:
+    """Create or edit one customer in a guarded modal dialog."""
+
+    def __init__(self) -> None:
+        self._dialog = GuardedDialog()
+        self._dialog.setModal(True)
+        self._dialog.setMinimumSize(700, 540)
+        self._controller: CustomerController | None = None
+        self._customer: Customer | None = None
+        self._customer_id: int | None = None
+        self._loading = False
+        self._dirty_state = DirtyStateTracker()
+        self._inputs = {
+            name: QLineEdit()
+            for name in (
+                "name",
+                "company_code",
+                "vat_code",
+                "phone",
+                "email",
+                "address",
+                "city",
+                "postal_code",
+                "country_code",
+            )
+        }
+        self.notes_input = QTextEdit()
+        self.company_type = QRadioButton("Juridinis asmuo")
+        self.individual_type = QRadioButton("Fizinis asmuo")
+        self.type_group = QButtonGroup(self._dialog)
+        self.type_group.addButton(self.company_type)
+        self.type_group.addButton(self.individual_type)
+        self.status_input = QComboBox()
+        self.status_input.addItem("Aktyvus", CUSTOMER_STATUS_ACTIVE)
+        self.status_input.addItem("Neaktyvus", CUSTOMER_STATUS_INACTIVE)
+        self._build_ui()
+        self._dialog.guard_close_with(self.close)
+        self._success_timer = QTimer(self._dialog)
+        self._success_timer.setSingleShot(True)
+        self._success_timer.setInterval(3_000)
+        self._success_timer.timeout.connect(self.message_label.clear)
+        for editor in self._inputs.values():
+            editor.textChanged.connect(self._on_changed)
+        self.notes_input.textChanged.connect(self._on_changed)
+        self.type_group.buttonClicked.connect(self._on_type_changed)
+        self.status_input.currentIndexChanged.connect(self._on_changed)
+
+    def _build_ui(self) -> None:
+        header = QHBoxLayout()
+        self.title_label = QLabel()
+        self.title_label.setObjectName("h1")
+        self.dirty_label = QLabel()
+        self.dirty_label.setObjectName("warning")
+        header.addWidget(self.title_label)
+        header.addWidget(self.dirty_label)
+        header.addStretch()
+        self.tabs = QTabWidget()
+        self.tabs.addTab(self._data_tab(), "Duomenys")
+        self.tabs.addTab(self._contacts_tab(), "Kontaktai")
+        self.tabs.addTab(self._address_tab(), "Adresas")
+        self.tabs.addTab(self._notes_tab(), "Pastabos")
+        history = QWidget()
+        self.tabs.addTab(history, "Istorija (greitai)")
+        self.tabs.setTabEnabled(4, False)
+        self.close_button = QPushButton("Uždaryti")
+        self.cancel_button = QPushButton("Atšaukti")
+        self.save_button = QPushButton("Išsaugoti")
+        self.save_button.setObjectName("primary")
+        self.message_label = QLabel()
+        self.close_button.clicked.connect(self.close)
+        self.cancel_button.clicked.connect(self.restore_snapshot)
+        self.save_button.clicked.connect(self._save)
+        actions = QHBoxLayout()
+        actions.addWidget(self.close_button)
+        actions.addWidget(self.message_label)
+        actions.addStretch()
+        actions.addWidget(self.cancel_button)
+        actions.addWidget(self.save_button)
+        layout = QVBoxLayout(self._dialog)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(16)
+        layout.addLayout(header)
+        layout.addWidget(self.tabs, 1)
+        layout.addLayout(actions)
+
+    def _data_tab(self) -> QWidget:
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        layout.setContentsMargins(24, 24, 24, 24)
+        types = QHBoxLayout()
+        types.addWidget(self.company_type)
+        types.addWidget(self.individual_type)
+        types.addStretch()
+        layout.addWidget(QLabel("Kliento tipas *"))
+        layout.addLayout(types)
+        layout.addWidget(form_field("Pavadinimas", self._inputs["name"], True))
+        self.company_code_field = form_field(
+            "Kodas", self._inputs["company_code"], True
+        )
+        self.vat_code_field = form_field("PVM kodas", self._inputs["vat_code"])
+        layout.addWidget(self.company_code_field)
+        layout.addWidget(self.vat_code_field)
+        layout.addWidget(form_field("Būsena", self.status_input))
+        layout.addStretch()
+        return tab
+
+    def _contacts_tab(self) -> QWidget:
+        tab = QWidget()
+        layout = QGridLayout(tab)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.addWidget(form_field("Telefonas", self._inputs["phone"]), 0, 0)
+        layout.addWidget(form_field("El. paštas", self._inputs["email"]), 0, 1)
+        layout.setRowStretch(1, 1)
+        return tab
+
+    def _address_tab(self) -> QWidget:
+        tab = QWidget()
+        layout = QGridLayout(tab)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(16)
+        layout.addWidget(form_field("Gatvė", self._inputs["address"]), 0, 0, 1, 2)
+        layout.addWidget(form_field("Miestas", self._inputs["city"]), 1, 0)
+        layout.addWidget(
+            form_field("Pašto kodas", self._inputs["postal_code"]), 1, 1
+        )
+        layout.addWidget(form_field("Šalis", self._inputs["country_code"]), 2, 0)
+        layout.setRowStretch(3, 1)
+        return tab
+
+    def _notes_tab(self) -> QWidget:
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.addWidget(form_field("Pastabos", self.notes_input), 1)
+        return tab
+
+    def bind_controller(self, controller: CustomerController) -> None:
+        self._controller = controller
+
+    def display_customer(
+        self, customer: Customer | None, values: dict[str, str]
+    ) -> None:
+        self._loading = True
+        self._customer = customer
+        self._customer_id = customer.id if customer else None
+        self.title_label.setText(
+            "Redaguoti klientą" if customer is not None else "Naujas klientas"
+        )
+        for name, editor in self._inputs.items():
+            editor.setText(values[name])
+        self.notes_input.setPlainText(values["notes"])
+        is_company = values["client_type"] == CUSTOMER_TYPE_COMPANY
+        self.company_type.setChecked(is_company)
+        self.individual_type.setChecked(not is_company)
+        index = self.status_input.findData(values["status"])
+        self.status_input.setCurrentIndex(max(index, 0))
+        self._update_type_fields()
+        self._dirty_state.capture(self.values())
+        self._loading = False
+        self.message_label.clear()
+        self.tabs.setCurrentIndex(0)
+        self._set_dirty(False)
+
+    def values(self) -> dict[str, str]:
+        values = {name: editor.text() for name, editor in self._inputs.items()}
+        values["notes"] = self.notes_input.toPlainText()
+        values["client_type"] = (
+            CUSTOMER_TYPE_INDIVIDUAL
+            if self.individual_type.isChecked()
+            else CUSTOMER_TYPE_COMPANY
+        )
+        values["status"] = str(self.status_input.currentData())
+        return values
+
+    def _on_type_changed(self) -> None:
+        self._update_type_fields()
+        self._on_changed()
+
+    def _update_type_fields(self) -> None:
+        visible = self.company_type.isChecked()
+        self.company_code_field.setVisible(visible)
+        self.vat_code_field.setVisible(visible)
+
+    def _on_changed(self) -> None:
+        if not self._loading:
+            self.message_label.clear()
+            self._success_timer.stop()
+            self._set_dirty(self._dirty_state.is_dirty(self.values()))
+
+    def _set_dirty(self, dirty: bool) -> None:
+        self.dirty_label.setText("● Neišsaugoti pakeitimai" if dirty else "")
+        required = bool(self._inputs["name"].text().strip()) and (
+            self.individual_type.isChecked()
+            or bool(self._inputs["company_code"].text().strip())
+        )
+        self.save_button.setEnabled(dirty and required)
+        self.cancel_button.setEnabled(dirty)
+
+    def restore_snapshot(self) -> None:
+        values = self._dirty_state.snapshot
+        self.display_customer(self._customer, values)
+
+    def _save(self) -> None:
+        if self._controller is None:
+            return
+        self.save_button.setEnabled(False)
+        try:
+            customer = self._controller.save_customer(self._customer_id, self.values())
+        except (ValueError, LookupError) as error:
+            self.message_label.setObjectName("error")
+            self.message_label.setText(str(error))
+            self._set_dirty(True)
+            return
+        self.display_customer(customer, self._controller.customer_values(customer))
+        self.message_label.setObjectName("success")
+        self.message_label.setText("Klientas išsaugotas")
+        self._success_timer.start()
+
+    def _confirm_discard(self) -> bool:
+        message = QMessageBox(self._dialog)
+        message.setWindowTitle("Neišsaugoti pakeitimai")
+        message.setText(
+            "Turite neišsaugotų pakeitimų. Ar tikrai norite uždaryti "
+            "neišsaugoję?"
+        )
+        back = message.addButton("Grįžti į formą", QMessageBox.ButtonRole.RejectRole)
+        discard = message.addButton(
+            "Uždaryti neišsaugant", QMessageBox.ButtonRole.DestructiveRole
+        )
+        message.setDefaultButton(back)
+        message.exec()
+        return message.clickedButton() is discard
+
+    def show(self) -> None:
+        self._dialog.show()
+        self._dialog.raise_()
+        self._dialog.activateWindow()
+
+    def close(self) -> None:
+        if self._dirty_state.is_dirty(self.values()) and not self._confirm_discard():
+            return
+        self._dialog.force_close()
+
+    def is_visible(self) -> bool:
+        return self._dialog.isVisible()

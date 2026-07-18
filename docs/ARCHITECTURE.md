@@ -2,11 +2,11 @@
 
 **Projektas:** PTH Fausta
 **Dokumentas:** ARCHITECTURE.md
-**Versija:** 1.4
+**Versija:** 1.5
 **Būsena:** Aktyvus
 **Autorius:** Produkto savininkas ir DI komanda
 **Sukūrimo data:** 2026-07-14
-**Paskutinis atnaujinimas:** 2026-07-17
+**Paskutinis atnaujinimas:** 2026-07-18
 
 ---
 
@@ -208,6 +208,19 @@ langas pasiekiamas per `Nustatymai → Įmonė`.
 
 Šis modelis taikomas visiems projekto moduliams.
 
+Antrasis pilnas vertikalus pjūvis yra klientų modulis:
+
+```text
+CustomerListView / CustomerDialog → CustomerController → CustomerService
+    → CustomerRepository → SessionFactory → SQLAlchemy ORM → SQLite
+```
+
+`CustomerService` yra vienintelė klientų validacijos, dublikatų kontrolės,
+paieškos, filtravimo ir rūšiavimo verslo taisyklių vieta. Sąrašo View yra
+įterpiamas į pagrindinio lango `QStackedWidget`, o kortelės redagavimas vyksta
+modaliniame dialoge. Modulis sujungiamas `bootstrap.py`, registruojamas
+`ServiceContainer` ir pasiekiamas per sidebar punktą „Klientai“.
+
 ---
 
 # 10. Testavimo principai
@@ -238,6 +251,12 @@ visiems naujiems ekranams. Centralizuoti dizaino žetonai laikomi
 `app.ui.theme`, o bendras QSS generuojamas `app.ui.styles`. View klasės gali
 valdyti tik pateikimą, prieinamumą ir vizualines būsenas; verslo taisyklės
 lieka Service sluoksnyje.
+
+Kortelės tipo dialogai dalijasi `DirtyStateTracker`, kuris lygina dabartines
+formos reikšmes su paskutine išsaugota kopija, ir `GuardedDialog`, kuris lango
+uždarymą bei Esc nukreipia per vieną dirty-state patvirtinimo kelią. Vertikaliai
+pažymėtiems laukams naudojamas bendras `form_field` komponentas. Šie
+komponentai skirti ir būsimiems Product, Supplier, User bei kitiems moduliams.
 
 Pagrindinį langą sudaro viršutinė juosta, suskleidžiama sidebar navigacija,
 `QStackedWidget` darbo sritis ir DB būsenos bei versijos juosta. Kol kiti
@@ -292,6 +311,7 @@ Kasdieniai programavimo darbai šiame dokumente nefiksuojami.
 
 | Versija | Data       | Pakeitimai                                           |
 | ------- | ---------- | ---------------------------------------------------- |
+| 1.5     | 2026-07-18 | Dokumentuotas klientų modulis ir bendri formų komponentai. |
 | 1.3     | 2026-07-17 | Dokumentuoti SQLAlchemy engine ir sesijų komponentai. |
 | 1.2     | 2026-07-17 | Dokumentuotas persistence konfigūracijos pagrindas.  |
 | 1.1     | 2026-07-17 | Formalizuotos sluoksnių priklausomybės ir jų testai. |

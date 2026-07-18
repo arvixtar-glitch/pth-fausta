@@ -4,6 +4,22 @@
 
 ### Pridėta
 
+#### Customer Module
+
+* Užbaigta Task 6.0B – įgyvendintas pilnas klientų modulio vertikalus pjūvis.
+* Pridėta `clients` ORM schema, `CustomerRepository`, `CustomerService` ir
+  `CustomerController` su CRUD, validacija, dublikatų kontrole, momentine
+  paieška, bendrais filtrais ir rūšiavimu.
+* Įgyvendinti `CustomerListView` ir modalinis `CustomerDialog` pagal
+  `CUSTOMER_MODULE_UI.md` v1.1: tabs, loading, empty, filtered-empty,
+  dirty-state, klaviatūros ir šalinimo scenarijai.
+* Klientų darbo sritis prijungta prie sidebar, `NavigationService`,
+  Composition Root ir `ServiceContainer`.
+* Išskirti bendri `DirtyStateTracker`, `GuardedDialog` ir `form_field`
+  komponentai, naudojami kliento ir įmonės formose.
+* Pridėti persistence, repository, service, controller, UI, navigacijos,
+  paieškos, filtrų ir būsenų testai.
+
 #### UI Foundation
 
 * Užbaigta Task 5.3A UI bazė pagal privalomą `UI_GUIDELINES.md`.

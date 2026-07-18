@@ -28,21 +28,11 @@ from PySide6.QtWidgets import (
 
 from app.models.company import Company, CompanyBankAccount
 from app.views.base_view import BaseView
+from app.views.dirty_state import DirtyStateTracker, GuardedDialog
+from app.views.form_components import form_field
 
 if TYPE_CHECKING:
     from app.controllers.company_controller import CompanyController
-
-
-def _field(label: str, editor: QWidget, required: bool = False) -> QWidget:
-    """Build a vertically labelled form field."""
-    container = QWidget()
-    layout = QVBoxLayout(container)
-    layout.setContentsMargins(0, 0, 0, 0)
-    layout.setSpacing(8)
-    caption = QLabel(f"{label}{' *' if required else ''}")
-    layout.addWidget(caption)
-    layout.addWidget(editor)
-    return container
 
 
 class BankAccountDialog(QDialog):
@@ -66,12 +56,12 @@ class BankAccountDialog(QDialog):
         self.error_label.setObjectName("error")
         grid = QGridLayout()
         grid.setSpacing(16)
-        grid.addWidget(_field("Banko pavadinimas", self.bank_name, True), 0, 0)
-        grid.addWidget(_field("IBAN", self.iban, True), 0, 1)
-        grid.addWidget(_field("BIC / SWIFT", self.swift_bic), 1, 0)
-        grid.addWidget(_field("Sąskaitos turėtojas", self.account_holder), 1, 1)
-        grid.addWidget(_field("Valiuta", self.currency), 2, 0)
-        grid.addWidget(_field("Būsena", self.status), 2, 1)
+        grid.addWidget(form_field("Banko pavadinimas", self.bank_name, True), 0, 0)
+        grid.addWidget(form_field("IBAN", self.iban, True), 0, 1)
+        grid.addWidget(form_field("BIC / SWIFT", self.swift_bic), 1, 0)
+        grid.addWidget(form_field("Sąskaitos turėtojas", self.account_holder), 1, 1)
+        grid.addWidget(form_field("Valiuta", self.currency), 2, 0)
+        grid.addWidget(form_field("Būsena", self.status), 2, 1)
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Save
             | QDialogButtonBox.StandardButton.Cancel
@@ -126,7 +116,7 @@ class CompanyView(BaseView):
     )
 
     def __init__(self) -> None:
-        self._dialog = QDialog()
+        self._dialog = GuardedDialog()
         self._dialog.setWindowTitle("Įmonės rekvizitai")
         self._dialog.setMinimumSize(760, 600)
         self._dialog.resize(900, 680)
@@ -135,9 +125,10 @@ class CompanyView(BaseView):
         self._inputs = {name: QLineEdit() for name, _label, _required in self.FIELDS}
         self._status = QComboBox()
         self._status.addItems(("active", "inactive"))
-        self._snapshot: dict[str, str] = {}
+        self._dirty_state = DirtyStateTracker()
         self._loading = False
         self._build_ui()
+        self._dialog.guard_close_with(self.close)
         self._success_timer = QTimer(self._dialog)
         self._success_timer.setSingleShot(True)
         self._success_timer.setInterval(7_000)
@@ -184,7 +175,7 @@ class CompanyView(BaseView):
         layout.setSpacing(24)
         layout.addLayout(self._group("Rekvizitai", self.FIELDS[:7]))
         layout.addLayout(self._group("Kontaktai", self.FIELDS[7:]))
-        layout.addWidget(_field("Būsena", self._status))
+        layout.addWidget(form_field("Būsena", self._status))
         layout.addStretch()
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
@@ -204,7 +195,11 @@ class CompanyView(BaseView):
         grid = QGridLayout()
         grid.setSpacing(16)
         for index, (name, label, required) in enumerate(fields):
-            grid.addWidget(_field(label, self._inputs[name], required), index // 2, index % 2)
+            grid.addWidget(
+                form_field(label, self._inputs[name], required),
+                index // 2,
+                index % 2,
+            )
         group.addLayout(grid)
         return group
 
@@ -263,7 +258,7 @@ class CompanyView(BaseView):
         for name, _label, _required in self.FIELDS:
             self._inputs[name].setText(getattr(company, name, "") if company else "")
         self._status.setCurrentText(company.status if company else "active")
-        self._snapshot = self._values()
+        self._dirty_state.capture(self._values())
         self._loading = False
         self._set_dirty(False)
 
@@ -290,7 +285,7 @@ class CompanyView(BaseView):
     def _update_dirty_state(self) -> None:
         if not self._loading:
             self._clear_success_message()
-            self._set_dirty(self._values() != self._snapshot)
+            self._set_dirty(self._dirty_state.is_dirty(self._values()))
 
     def _clear_success_message(self) -> None:
         if self.message_label.objectName() == "success":
@@ -304,7 +299,7 @@ class CompanyView(BaseView):
 
     def restore_snapshot(self) -> None:
         self._loading = True
-        for name, value in self._snapshot.items():
+        for name, value in self._dirty_state.snapshot.items():
             if name == "status":
                 self._status.setCurrentText(value)
             else:
@@ -376,7 +371,7 @@ class CompanyView(BaseView):
         self._dialog.activateWindow()
 
     def close(self) -> None:
-        if self._values() != self._snapshot:
+        if self._dirty_state.is_dirty(self._values()):
             answer = QMessageBox.question(
                 self._dialog,
                 "Neišsaugoti pakeitimai",
@@ -389,6 +384,6 @@ class CompanyView(BaseView):
                 return
             if answer == QMessageBox.StandardButton.Save:
                 self._save_company()
-                if self._values() != self._snapshot:
+                if self._dirty_state.is_dirty(self._values()):
                     return
-        self._dialog.close()
+        self._dialog.force_close()

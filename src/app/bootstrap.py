@@ -9,6 +9,7 @@ from PySide6.QtWidgets import QApplication
 from app.controllers.app_controller import AppController
 from app.controllers.company_controller import CompanyController
 from app.controllers.customer_controller import CustomerController
+from app.controllers.product_controller import ProductController
 from app.core.app import Application
 from app.core.app_state import AppState
 from app.core.event_bus import EventBus
@@ -21,13 +22,17 @@ from app.persistence.orm import OrmBase
 from app.persistence.session_factory import SessionFactory
 from app.repositories.company_repository import CompanyRepository
 from app.repositories.customer_repository import CustomerRepository
+from app.repositories.product_repository import ProductRepository
 from app.services.company_service import CompanyService
 from app.services.customer_service import CustomerService
+from app.services.product_service import ProductService
 from app.services.navigation_service import NavigationService
 from app.ui.styles import application_stylesheet
 from app.views.company_view import CompanyView
 from app.views.customer_dialog import CustomerDialog
 from app.views.customer_list_view import CustomerListView
+from app.views.product_dialog import ProductDialog
+from app.views.product_list_view import ProductListView
 from app.views.main_view import MainView
 
 __all__ = ["bootstrap"]
@@ -61,8 +66,17 @@ def bootstrap() -> Application:
     customer_controller = CustomerController(
         customer_service, customer_view, customer_dialog
     )
+    product_repository = ProductRepository(session_factory)
+    product_service = ProductService(product_repository, company_service)
+    product_service.ensure_default_units()
+    product_view = ProductListView()
+    product_dialog = ProductDialog()
+    product_controller = ProductController(
+        product_service, product_view, product_dialog
+    )
     main_view = MainView()
     main_view.set_customer_view(customer_view)
+    main_view.set_product_view(product_view)
     main_view.set_company_exists(company_service.get_company() is not None)
     company_controller.on_company_changed(main_view.set_company_exists)
 
@@ -73,7 +87,12 @@ def bootstrap() -> Application:
     def open_company() -> None:
         company_controller.start()
 
+    def open_products() -> None:
+        main_view.show_products()
+        product_controller.refresh()
+
     main_view.on_open_customers(open_customers)
+    main_view.on_open_products(open_products)
     main_view.on_open_company(open_company)
     app_controller = AppController(main_view)
 
@@ -94,6 +113,11 @@ def bootstrap() -> Application:
     container.register(CustomerListView, customer_view)
     container.register(CustomerDialog, customer_dialog)
     container.register(CustomerController, customer_controller)
+    container.register(ProductRepository, product_repository)
+    container.register(ProductService, product_service)
+    container.register(ProductListView, product_view)
+    container.register(ProductDialog, product_dialog)
+    container.register(ProductController, product_controller)
 
     application = Application(
         app_state,

@@ -3,7 +3,12 @@
 from collections.abc import Callable
 
 from PySide6.QtWidgets import (
-    QHBoxLayout, QLabel, QMainWindow, QPushButton, QStackedWidget, QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QMainWindow,
+    QPushButton,
+    QStackedWidget,
+    QVBoxLayout,
     QWidget,
 )
 
@@ -11,6 +16,7 @@ from app.core.version import APP_VERSION
 from app.views.base_view import BaseView
 from app.views.home_view import HomeView
 from app.views.customer_list_view import CustomerListView
+from app.views.product_list_view import ProductListView
 
 SIDEBAR_EXPANDED_WIDTH = 273
 SIDEBAR_COLLAPSED_WIDTH = 64
@@ -42,16 +48,21 @@ class MainView(BaseView):
         self._sidebar_layout.addWidget(self.collapse_button)
         self.home_button = self._nav_button("⌂", "Pradžia", True)
         self.customer_button = self._nav_button("♙", "Klientai")
+        self.product_button = self._nav_button("□", "Prekės ir paslaugos")
         self.company_button = self._nav_button("⚙", "Įmonė")
         self.home_button.clicked.connect(self.show_home)
         self.customer_button.clicked.connect(
             lambda: self.set_active_navigation("customers")
+        )
+        self.product_button.clicked.connect(
+            lambda: self.set_active_navigation("products")
         )
         self.company_button.clicked.connect(
             lambda: self.set_active_navigation("company")
         )
         self._sidebar_layout.addWidget(self.home_button)
         self._sidebar_layout.addWidget(self.customer_button)
+        self._sidebar_layout.addWidget(self.product_button)
         self._sidebar_layout.addStretch()
         self._sidebar_layout.addWidget(self.company_button)
         self.workspace = QStackedWidget()
@@ -89,8 +100,15 @@ class MainView(BaseView):
     def on_open_customers(self, callback: Callable[[], None]) -> None:
         self.customer_button.clicked.connect(callback)
 
+    def on_open_products(self, callback: Callable[[], None]) -> None:
+        self.product_button.clicked.connect(callback)
+
     def set_customer_view(self, view: CustomerListView) -> None:
         self.customer_view = view
+        self.workspace.addWidget(view.widget)
+
+    def set_product_view(self, view: ProductListView) -> None:
+        self.product_view = view
         self.workspace.addWidget(view.widget)
 
     def show_home(self) -> None:
@@ -102,6 +120,11 @@ class MainView(BaseView):
             self.workspace.setCurrentWidget(self.customer_view.widget)
         self.set_active_navigation("customers")
 
+    def show_products(self) -> None:
+        if hasattr(self, "product_view"):
+            self.workspace.setCurrentWidget(self.product_view.widget)
+        self.set_active_navigation("products")
+
     def set_company_exists(self, exists: bool) -> None:
         """Update actions whose availability depends on a company profile."""
         if hasattr(self, "home_view"):
@@ -110,6 +133,7 @@ class MainView(BaseView):
     def set_active_navigation(self, name: str) -> None:
         self.home_button.setChecked(name == "home")
         self.customer_button.setChecked(name == "customers")
+        self.product_button.setChecked(name == "products")
         self.company_button.setChecked(name == "company")
 
     def toggle_sidebar(self) -> None:
@@ -119,7 +143,12 @@ class MainView(BaseView):
             if self._sidebar_collapsed
             else SIDEBAR_EXPANDED_WIDTH
         )
-        for button in (self.home_button, self.customer_button, self.company_button):
+        for button in (
+            self.home_button,
+            self.customer_button,
+            self.product_button,
+            self.company_button,
+        ):
             text = (
                 button.property("iconText")
                 if self._sidebar_collapsed

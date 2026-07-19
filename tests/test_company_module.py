@@ -92,6 +92,15 @@ def test_deleting_default_promotes_remaining_account(
     assert service.list_bank_accounts()[0].is_default is True
 
 
+def test_company_vat_payer_status_is_centralized(
+    repository: CompanyRepository,
+) -> None:
+    service = CompanyService(repository)
+    assert service.is_vat_payer() is False
+    service.save_company({"name": "Fausta", "vat_code": "  LT123  "})
+    assert service.is_vat_payer() is True
+
+
 class FakeCompanyView:
     """Record controller output without Qt."""
 

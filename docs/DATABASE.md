@@ -1,9 +1,9 @@
 # PTH Fausta – Duomenų bazės architektūra
 
 **Dokumentas:** DATABASE.md  
-**Versija:** 1.2
+**Versija:** 1.3
 **Būsena:** Patvirtinta kryptis  
-**Data:** 2026-07-17
+**Data:** 2026-07-19
 
 ## Paskirtis
 
@@ -141,9 +141,35 @@ tekstas; SQLite FTS5 kol kas nėra privaloma technologija.
 
 ### Prekės ir paslaugos
 
-`products` numatyti laukai: `id`, `code`, `name`, `description`, `unit`,
-`default_quantity`, `unit_price`, `currency`, `vat_rate`, `status`,
-`created_at`, `updated_at`.
+Prekės ir paslaugos saugomos viename `products` aggregate. Task 7.0B naudoja
+keturias lenteles: `products`, `product_categories`, `units_of_measure` ir
+`product_barcodes`.
+
+`products` laukai: `id`, `code`, `name`, `product_type`, `category_id`,
+`unit_id`, `unit_price`, `price_basis`, `vat_treatment`, `vat_rate`, `status`,
+`notes`, `created_at`, `updated_at`. `product_type` reikšmės yra `product` ir
+`service`; `price_basis` – `net` ir `final`; `status` – `active` ir `inactive`.
+Pinigai saugomi kaip `NUMERIC(12, 2)`.
+
+`vat_treatment` reikšmės yra `rate`, `not_vat_object` ir `not_applicable`.
+`rate` kartu su `vat_rate = 0` reiškia 0 % tarifą, o `not_vat_object` kartu su
+`vat_rate = NULL` – „Ne PVM objektas“. `not_applicable` ir `vat_rate = NULL`
+naudojami, kai įmonė nėra PVM mokėtoja.
+
+`product_categories` laukai: `id`, `name`, `normalized_name`, `created_at`,
+`updated_at`. Normalizuotas pavadinimas yra unikalus. `units_of_measure`
+laukai: `id`, `code`, `name`, `status`, `created_at`, `updated_at`; `code` yra
+unikalus, o pradinis kontroliuojamas sąrašas įkeliamas programos serviso.
+
+`product_barcodes` laukai: `id`, `product_id`, `barcode`, `barcode_type`,
+`is_default`, `created_at`, `updated_at`. Barkodas globaliai unikalus. Vienas
+produktas gali turėti kelis barkodus, bet daugiausia vieną numatytąjį.
+Produkto ir barkodų pakeitimai išsaugomi viena transakcija.
+
+UI veiksmas „Šalinti“ produkto fiziškai netrina: jo būsena pakeičiama į
+`inactive`. `description`, `default_quantity` ir `currency` Task 7.0B metu
+nekuriami. Nuotraukos, savikaina, kelios kainos, nuolaidos, valiutos, kainų
+galiojimas, likučiai, serijiniai numeriai, importas ir eksportas lieka ateičiai.
 
 Istorinė dokumento eilutė saugo produkto duomenų kopiją, todėl vėlesni produkto
 pavadinimo ar kainos pakeitimai nekeičia užbaigto dokumento.

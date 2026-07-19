@@ -16,6 +16,11 @@ class CompanyService(BaseService):
     def get_company(self) -> Company | None:
         return self._repository.get_company()
 
+    def is_vat_payer(self) -> bool:
+        """Return the centralized temporary company VAT status."""
+        company = self.get_company()
+        return bool(company and company.vat_code.strip())
+
     def save_company(self, values: dict[str, str]) -> Company:
         clean_values = {key: value.strip() for key, value in values.items()}
         if not clean_values.get("name"):

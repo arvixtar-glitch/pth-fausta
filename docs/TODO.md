@@ -65,6 +65,14 @@
 ## 6 etapas – Verslo moduliai
 
 * [x] Task 6.0B – Klientų modulis.
+* [x] Task 7.0A-DOC – patvirtintos Customer ir Product UI specifikacijos.
+* [x] Task 7.0B – Prekių ir paslaugų modulis.
+* [ ] Task 8.0A – Application Readiness State.
+  Sukurti bendrą sistemos parengties mechanizmą, kuris nustato, ar programa
+  paruošta dokumentų išrašymui, ir tampa pagrindu būsimam Setup Wizard.
+  Company ir nustatymų funkcijos lieka pasiekiamos; dokumentų išrašymas
+  ateityje bus blokuojamas, kol įmonės profilis neužbaigtas. Šis mechanizmas
+  nėra Task 7.0B dalis.
 * [ ] Pardavėjas.
 * [ ] Sąskaitos.
 * [ ] PDF generavimas.

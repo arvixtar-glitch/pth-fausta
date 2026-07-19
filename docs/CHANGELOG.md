@@ -4,6 +4,22 @@
 
 ### Pridėta
 
+#### Product Module
+
+* Užbaigta Task 7.0B – įgyvendintas prekių ir paslaugų modulio vertikalus
+  pjūvis su viena `Product` aggregate šaknimi.
+* Pridėtos `products`, `product_categories`, `units_of_measure` ir
+  `product_barcodes` ORM lentelės, valdomi žodynai ir keli globaliai unikalūs
+  barkodai.
+* Įgyvendinta Decimal kainodara, `price_basis`, atskiros 0 % ir „Ne PVM
+  objektas“ reikšmės bei centralizuotas `CompanyService.is_vat_payer()`.
+* Pridėti Product repository, service, controller, sąrašo View ir modalinis
+  dialogas su loading, empty, filtrais, rūšiavimu ir aggregate dirty state.
+* Sidebar darbo sritis papildyta punktu „Prekės ir paslaugos“, nekeičiant
+  `MainView` ir `AppController` gyvavimo ciklo.
+* Pridėti ORM, transakcijų, validacijos, kainodaros, controller, Qt UI ir
+  pilnos Home → Customers → Products navigacijos regresijos testai.
+
 #### Customer Module
 
 * Pataisyta Task 6.0C navigacijos regresija: sidebar darbo srities perėjimai

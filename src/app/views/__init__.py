@@ -6,6 +6,8 @@ from app.views.customer_dialog import CustomerDialog
 from app.views.customer_list_view import CustomerListView
 from app.views.home_view import HomeView
 from app.views.main_view import MainView
+from app.views.product_dialog import ProductDialog
+from app.views.product_list_view import ProductListView
 
 __all__ = [
     "BaseView",
@@ -14,4 +16,6 @@ __all__ = [
     "CustomerListView",
     "HomeView",
     "MainView",
+    "ProductDialog",
+    "ProductListView",
 ]

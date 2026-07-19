@@ -24,6 +24,7 @@ def test_repositories_are_exported_from_repositories_package() -> None:
         "BaseRepository",
         "CompanyRepository",
         "CustomerRepository",
+        "ProductRepository",
     }
 
 

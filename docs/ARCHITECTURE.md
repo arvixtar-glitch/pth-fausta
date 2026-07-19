@@ -2,7 +2,7 @@
 
 **Projektas:** PTH Fausta
 **Dokumentas:** ARCHITECTURE.md
-**Versija:** 1.5
+**Versija:** 1.6
 **Būsena:** Aktyvus
 **Autorius:** Produkto savininkas ir DI komanda
 **Sukūrimo data:** 2026-07-14
@@ -221,6 +221,20 @@ paieškos, filtravimo ir rūšiavimo verslo taisyklių vieta. Sąrašo View yra
 modaliniame dialoge. Modulis sujungiamas `bootstrap.py`, registruojamas
 `ServiceContainer` ir pasiekiamas per sidebar punktą „Klientai“.
 
+Trečiasis pilnas vertikalus pjūvis yra prekių ir paslaugų modulis:
+
+```text
+ProductListView / ProductDialog → ProductController → ProductService
+    → ProductRepository → SessionFactory → SQLAlchemy ORM → SQLite
+```
+
+`Product` yra vienas aggregate prekėms ir paslaugoms. Jis atominiu būdu valdo
+kainodarą ir kelis barkodus, o kategorijos bei matavimo vienetai saugomi
+kontroliuojamuose žodynuose. `CompanyService.is_vat_payer()` centralizuoja
+laikiną įmonės PVM režimo nustatymą. Sąrašo View įterptas į gyvą pagrindinio
+lango `QStackedWidget`; sidebar navigacija nestabdo `AppController` ir
+neuždaro `MainView`.
+
 ---
 
 # 10. Testavimo principai
@@ -259,8 +273,9 @@ pažymėtiems laukams naudojamas bendras `form_field` komponentas. Šie
 komponentai skirti ir būsimiems Product, Supplier, User bei kitiems moduliams.
 
 Pagrindinį langą sudaro viršutinė juosta, suskleidžiama sidebar navigacija,
-`QStackedWidget` darbo sritis ir DB būsenos bei versijos juosta. Kol kiti
-moduliai neįgyvendinti, aktyvūs tik pradinis puslapis ir įmonės rekvizitai.
+`QStackedWidget` darbo sritis ir DB būsenos bei versijos juosta. Darbo srityje
+aktyvūs pradinis puslapis, klientų ir prekių bei paslaugų sąrašai; įmonės
+rekvizitai atidaromi kaip nustatymų langas.
 
 ---
 
@@ -311,6 +326,7 @@ Kasdieniai programavimo darbai šiame dokumente nefiksuojami.
 
 | Versija | Data       | Pakeitimai                                           |
 | ------- | ---------- | ---------------------------------------------------- |
+| 1.6     | 2026-07-19 | Dokumentuotas Product vertikalus pjūvis, aggregate ir PVM režimo sąveika. |
 | 1.5     | 2026-07-18 | Dokumentuotas klientų modulis ir bendri formų komponentai. |
 | 1.3     | 2026-07-17 | Dokumentuoti SQLAlchemy engine ir sesijų komponentai. |
 | 1.2     | 2026-07-17 | Dokumentuotas persistence konfigūracijos pagrindas.  |

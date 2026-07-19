@@ -1,15 +1,5 @@
-"""Reusable form layout components."""
+"""Backward-compatible form component import."""
 
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
+from app.ui.shared.forms import form_field
 
-
-def form_field(label: str, editor: QWidget, required: bool = False) -> QWidget:
-    """Build a vertically labelled form field."""
-    container = QWidget()
-    layout = QVBoxLayout(container)
-    layout.setContentsMargins(0, 0, 0, 0)
-    layout.setSpacing(8)
-    caption = QLabel(f"{label}{' *' if required else ''}")
-    layout.addWidget(caption)
-    layout.addWidget(editor)
-    return container
+__all__ = ["form_field"]

@@ -22,6 +22,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool
 
 from app.controllers.app_controller import AppController
+from app.controllers.company_controller import CompanyController
 from app.controllers.product_controller import ProductController
 from app.models.product import Product, ProductBarcode, ProductCategory, UnitOfMeasure
 from app.persistence.orm import OrmBase
@@ -32,6 +33,7 @@ from app.services.company_service import CompanyService
 from app.services.navigation_service import NavigationService
 from app.services.product_service import ProductService
 from app.views.customer_list_view import CustomerListView
+from app.views.company_view import CompanyView
 from app.views.main_view import MainView
 from app.views.product_dialog import ProductDialog
 from app.views.product_list_view import ProductListView
@@ -217,11 +219,20 @@ def test_live_product_workspace_smoke_flow(application: QApplication) -> None:
     view, dialog = ProductListView(), ProductDialog()
     controller = ProductController(service, view, dialog)
     customers = CustomerListView()
+    company_view = CompanyView()
+    company_controller = CompanyController(company, company_view)
     main = MainView()
     main.set_customer_view(customers)
     main.set_product_view(view)
     main.on_open_products(lambda: (main.show_products(), controller.refresh()))
+    main.on_open_customers(main.show_customers)
+    main.on_open_company(company_controller.start)
     main.show()
+    main.company_button.click()
+    application.processEvents()
+    assert company_view._dialog.isVisible()
+    company_view.close()
+    main.customer_button.click()
     main.product_button.click()
     application.processEvents()
 
@@ -257,7 +268,10 @@ def test_live_product_workspace_smoke_flow(application: QApplication) -> None:
     main.home_button.click()
     main.customer_button.click()
     main.product_button.click()
-    main.home_button.click()
+    main.company_button.click()
+    application.processEvents()
+    assert company_view._dialog.isVisible()
+    company_view.close()
     main.product_button.click()
     assert main.workspace.currentWidget() is view.widget
     main.close()

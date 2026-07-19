@@ -4,6 +4,20 @@
 
 ### Pridėta
 
+#### Shared UI Components
+
+* Užbaigta Task 7.5 – sukurta `app.ui.shared` komponentų biblioteka.
+* `CustomerListView` ir `ProductListView` perkelti ant bendro `BaseListView`,
+  kuris valdo toolbar, paieškos, filtrų, lentelės, loading, empty ir statuso
+  sritis nekeisdamas naudotojo scenarijų.
+* Pridėti `CrudToolbar`, `FilterBar`, `ActionTable`, `EmptyStateWidget`,
+  `LoadingStateWidget`, `StatusBarWidget`, `CardDialogShell` ir
+  `ConfirmationDialog`.
+* Company, Customer ir Product formos naudoja vieną bendrą `form_field`
+  komponentą; ankstesnis importo kelias paliktas suderinamumui.
+* Pridėti bendrų komponentų, sąrašo būsenų, toolbar, filtrų ir dialogo karkaso
+  testai.
+
 #### Product Module
 
 * Užbaigta Task 7.0B – įgyvendintas prekių ir paslaugų modulio vertikalus

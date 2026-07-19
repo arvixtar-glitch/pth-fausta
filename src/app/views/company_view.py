@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (
 from app.models.company import Company, CompanyBankAccount
 from app.views.base_view import BaseView
 from app.views.dirty_state import DirtyStateTracker, GuardedDialog
-from app.views.form_components import form_field
+from app.ui.shared import form_field
 
 if TYPE_CHECKING:
     from app.controllers.company_controller import CompanyController
@@ -187,7 +187,9 @@ class CompanyView(BaseView):
         wrapper_layout.addWidget(scroll)
         return wrapper
 
-    def _group(self, title: str, fields: tuple[tuple[str, str, bool], ...]) -> QVBoxLayout:
+    def _group(
+        self, title: str, fields: tuple[tuple[str, str, bool], ...]
+    ) -> QVBoxLayout:
         group = QVBoxLayout()
         heading = QLabel(title)
         heading.setObjectName("h3")

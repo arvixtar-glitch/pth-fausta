@@ -4,17 +4,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (
     QButtonGroup,
     QComboBox,
     QGridLayout,
     QHBoxLayout,
     QLabel,
-    QMessageBox,
-    QPushButton,
     QRadioButton,
-    QTabWidget,
     QTextEdit,
     QVBoxLayout,
     QWidget,
@@ -29,7 +25,7 @@ from app.models.customer import (
     Customer,
 )
 from app.views.dirty_state import DirtyStateTracker, GuardedDialog
-from app.views.form_components import form_field
+from app.ui.shared import CardDialogShell, ConfirmationDialog, form_field
 
 if TYPE_CHECKING:
     from app.controllers.customer_controller import CustomerController
@@ -72,10 +68,6 @@ class CustomerDialog:
         self.status_input.addItem("Neaktyvus", CUSTOMER_STATUS_INACTIVE)
         self._build_ui()
         self._dialog.guard_close_with(self.close)
-        self._success_timer = QTimer(self._dialog)
-        self._success_timer.setSingleShot(True)
-        self._success_timer.setInterval(3_000)
-        self._success_timer.timeout.connect(self.message_label.clear)
         for editor in self._inputs.values():
             editor.textChanged.connect(self._on_changed)
         self.notes_input.textChanged.connect(self._on_changed)
@@ -83,42 +75,25 @@ class CustomerDialog:
         self.status_input.currentIndexChanged.connect(self._on_changed)
 
     def _build_ui(self) -> None:
-        header = QHBoxLayout()
-        self.title_label = QLabel()
-        self.title_label.setObjectName("h1")
-        self.dirty_label = QLabel()
-        self.dirty_label.setObjectName("warning")
-        header.addWidget(self.title_label)
-        header.addWidget(self.dirty_label)
-        header.addStretch()
-        self.tabs = QTabWidget()
+        shell = CardDialogShell(
+            self._dialog,
+            close=self.close,
+            restore=self.restore_snapshot,
+            save=self._save,
+        )
+        self.title_label = shell.title_label
+        self.dirty_label = shell.dirty_label
+        self.tabs = shell.tabs
+        self.close_button = shell.close_button
+        self.cancel_button = shell.cancel_button
+        self.save_button = shell.save_button
+        self.message_label = shell.message_label
+        self._success_timer = shell.success_timer
         self.tabs.addTab(self._data_tab(), "Duomenys")
         self.tabs.addTab(self._contacts_tab(), "Kontaktai")
         self.tabs.addTab(self._address_tab(), "Adresas")
         self.tabs.addTab(self._notes_tab(), "Pastabos")
-        history = QWidget()
-        self.tabs.addTab(history, "Istorija (greitai)")
-        self.tabs.setTabEnabled(4, False)
-        self.close_button = QPushButton("Uždaryti")
-        self.cancel_button = QPushButton("Atšaukti")
-        self.save_button = QPushButton("Išsaugoti")
-        self.save_button.setObjectName("primary")
-        self.message_label = QLabel()
-        self.close_button.clicked.connect(self.close)
-        self.cancel_button.clicked.connect(self.restore_snapshot)
-        self.save_button.clicked.connect(self._save)
-        actions = QHBoxLayout()
-        actions.addWidget(self.close_button)
-        actions.addWidget(self.message_label)
-        actions.addStretch()
-        actions.addWidget(self.cancel_button)
-        actions.addWidget(self.save_button)
-        layout = QVBoxLayout(self._dialog)
-        layout.setContentsMargins(24, 24, 24, 24)
-        layout.setSpacing(16)
-        layout.addLayout(header)
-        layout.addWidget(self.tabs, 1)
-        layout.addLayout(actions)
+        shell.add_reserved_tab("Istorija (greitai)")
 
     def _data_tab(self) -> QWidget:
         tab = QWidget()
@@ -157,9 +132,7 @@ class CustomerDialog:
         layout.setSpacing(16)
         layout.addWidget(form_field("Gatvė", self._inputs["address"]), 0, 0, 1, 2)
         layout.addWidget(form_field("Miestas", self._inputs["city"]), 1, 0)
-        layout.addWidget(
-            form_field("Pašto kodas", self._inputs["postal_code"]), 1, 1
-        )
+        layout.addWidget(form_field("Pašto kodas", self._inputs["postal_code"]), 1, 1)
         layout.addWidget(form_field("Šalis", self._inputs["country_code"]), 2, 0)
         layout.setRowStretch(3, 1)
         return tab
@@ -254,19 +227,15 @@ class CustomerDialog:
         self._success_timer.start()
 
     def _confirm_discard(self) -> bool:
-        message = QMessageBox(self._dialog)
-        message.setWindowTitle("Neišsaugoti pakeitimai")
-        message.setText(
-            "Turite neišsaugotų pakeitimų. Ar tikrai norite uždaryti "
-            "neišsaugoję?"
+        return ConfirmationDialog.ask(
+            self._dialog,
+            title="Neišsaugoti pakeitimai",
+            text=(
+                "Turite neišsaugotų pakeitimų. Ar tikrai norite uždaryti neišsaugoję?"
+            ),
+            destructive_text="Uždaryti neišsaugant",
+            cancel_text="Grįžti į formą",
         )
-        back = message.addButton("Grįžti į formą", QMessageBox.ButtonRole.RejectRole)
-        discard = message.addButton(
-            "Uždaryti neišsaugant", QMessageBox.ButtonRole.DestructiveRole
-        )
-        message.setDefaultButton(back)
-        message.exec()
-        return message.clickedButton() is discard
 
     def show(self) -> None:
         self._dialog.show()

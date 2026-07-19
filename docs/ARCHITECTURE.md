@@ -2,7 +2,7 @@
 
 **Projektas:** PTH Fausta
 **Dokumentas:** ARCHITECTURE.md
-**Versija:** 1.6
+**Versija:** 1.7
 **Būsena:** Aktyvus
 **Autorius:** Produkto savininkas ir DI komanda
 **Sukūrimo data:** 2026-07-14
@@ -272,6 +272,23 @@ uždarymą bei Esc nukreipia per vieną dirty-state patvirtinimo kelią. Vertika
 pažymėtiems laukams naudojamas bendras `form_field` komponentas. Šie
 komponentai skirti ir būsimiems Product, Supplier, User bei kitiems moduliams.
 
+Pakartotinai naudojami Qt komponentai laikomi `app.ui.shared` pakete.
+`BaseListView` apibrėžia vienodą modulio sąrašo karkasą: antraštę, CRUD
+veiksmus, momentinę paiešką, filtrus, lentelę, loading ir empty būsenas bei
+įrašų skaičiaus juostą. `CustomerListView` ir `ProductListView` paveldi šį
+karkasą ir pateikia tik domenui būdingus stulpelius, tekstus bei signalus.
+
+`CrudToolbar`, `FilterBar`, `ActionTable`, `EmptyStateWidget`,
+`LoadingStateWidget` ir `StatusBarWidget` naudojami per `BaseListView` arba
+tiesiogiai, kai ekranas turi tą pačią elgseną. `CardDialogShell` suvienodina
+Customer ir Product kortelių antraštę, skirtukus bei veiksmų juostą, bet
+nekeičia `DirtyStateTracker` ir `GuardedDialog`. `form_field` yra vienintelis
+Company, Customer ir Product vertikaliai pažymėtų laukų šaltinis.
+
+Bendri komponentai kuriami tik tada, kai juos realiai naudoja bent du moduliai.
+Domeno tekstai, lentelės duomenų atvaizdavimas ir validacijos lieka konkretaus
+modulio View arba Service atsakomybėse; shared paketas neturi verslo logikos.
+
 Pagrindinį langą sudaro viršutinė juosta, suskleidžiama sidebar navigacija,
 `QStackedWidget` darbo sritis ir DB būsenos bei versijos juosta. Darbo srityje
 aktyvūs pradinis puslapis, klientų ir prekių bei paslaugų sąrašai; įmonės
@@ -326,6 +343,7 @@ Kasdieniai programavimo darbai šiame dokumente nefiksuojami.
 
 | Versija | Data       | Pakeitimai                                           |
 | ------- | ---------- | ---------------------------------------------------- |
+| 1.7     | 2026-07-19 | Dokumentuota `app.ui.shared` biblioteka, `BaseListView` ir bendrų komponentų naudojimo taisyklės. |
 | 1.6     | 2026-07-19 | Dokumentuotas Product vertikalus pjūvis, aggregate ir PVM režimo sąveika. |
 | 1.5     | 2026-07-18 | Dokumentuotas klientų modulis ir bendri formų komponentai. |
 | 1.3     | 2026-07-17 | Dokumentuoti SQLAlchemy engine ir sesijų komponentai. |
